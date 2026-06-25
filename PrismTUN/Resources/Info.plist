@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Hide from Dock; show only in menu bar -->
+    <key>LSUIElement</key>
+    <true/>
+
+    <key>CFBundleIdentifier</key>
+    <string>com.prismtun.app</string>
+
+    <key>CFBundleName</key>
+    <string>PrismTUN</string>
+
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.0</string>
+
+    <key>CFBundleVersion</key>
+    <string>1</string>
+
+    <key>NSHumanReadableCopyright</key>
+    <string>Copyright © 2026 PrismTUN. All rights reserved.</string>
+
+    <!-- Required for networksetup calls -->
+    <key>NSAppleEventsUsageDescription</key>
+    <string>PrismTUN needs to configure system proxy settings.</string>
+
+    <key>NSHighResolutionCapable</key>
+    <true/>
+</dict>
+</plist>
