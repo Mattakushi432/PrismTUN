@@ -11,8 +11,8 @@ final class VPNManager {
     private(set) var errorMessage: String?
 
     let profileManager: ProfileManager
-    private let singBox   = SingBoxManager()
-    private let sysProxy  = SystemProxyManager()
+    private let singBox  = SingBoxManager()
+    private let sysProxy = SystemProxyManager()
     private var statsTask: Task<Void, Never>?
 
     init(profileManager: ProfileManager) {
@@ -27,8 +27,10 @@ final class VPNManager {
         status = .connecting
         errorMessage = nil
 
+        let apiSecret = UUID().uuidString
+
         do {
-            try await singBox.start(profile: profile, mode: mode, rules: rules)
+            try await singBox.start(profile: profile, mode: mode, rules: rules, apiSecret: apiSecret)
             if mode == .systemProxy || mode == .global {
                 try await sysProxy.enable()
             }
@@ -46,16 +48,20 @@ final class VPNManager {
         statsTask?.cancel()
         statsTask = nil
 
-        do {
-            try await sysProxy.disable()
-            try await singBox.stop()
-        } catch {
-            print("[VPNManager] disconnect error: \(error)")
-        }
+        // Run both cleanup steps unconditionally and surface any failure to the UI
+        var errors: [Error] = []
+        do { try await sysProxy.disable() } catch { errors.append(error) }
+        do { try await singBox.stop()     } catch { errors.append(error) }
 
         isConnected = false
-        status      = .disconnected
-        stats       = .zero
+        if errors.isEmpty {
+            status       = .disconnected
+            errorMessage = nil
+        } else {
+            status       = .failed
+            errorMessage = errors.map(\.localizedDescription).joined(separator: "; ")
+        }
+        stats = .zero
     }
 
     func setMode(_ mode: ConnectionMode) async {
@@ -71,11 +77,11 @@ final class VPNManager {
 
     private func startStatsPolling() {
         statsTask = Task {
-            var prev: TrafficPayload? = nil
+            var prev: TrafficPayload?
             while !Task.isCancelled {
                 if let payload = await singBox.fetchTraffic() {
-                    let upload   = payload.up
-                    let download = payload.down
+                    let upload    = payload.up
+                    let download  = payload.down
                     let upSpeed   = prev.map { max(0, upload   - $0.up)   } ?? 0
                     let downSpeed = prev.map { max(0, download - $0.down) } ?? 0
                     stats = TrafficStats(
@@ -86,7 +92,11 @@ final class VPNManager {
                     )
                     prev = payload
                 }
-                try? await Task.sleep(for: .seconds(1))
+                do {
+                    try await Task.sleep(for: .seconds(1))
+                } catch is CancellationError {
+                    break
+                } catch {}
             }
         }
     }

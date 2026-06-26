@@ -10,11 +10,13 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         options: [String: NSObject]?,
         completionHandler: @escaping (Error?) -> Void
     ) {
-        // 1. Read saved profile from shared UserDefaults (App Group)
-        // 2. Generate sing-box config with tun inbound
-        // 3. Launch sing-box binary from bundle
-        // 4. Configure tunnel network settings
-        completionHandler(nil)
+        // Phase-2 TUN mode is not yet implemented.
+        // Returning an error prevents the OS from signalling a false "Connected" state.
+        completionHandler(NSError(
+            domain: NEVPNErrorDomain,
+            code: NEVPNError.Code.configurationInvalid.rawValue,
+            userInfo: [NSLocalizedDescriptionKey: "TUN mode is not yet implemented"]
+        ))
     }
 
     override func stopTunnel(

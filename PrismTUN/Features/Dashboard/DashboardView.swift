@@ -12,6 +12,7 @@ struct DashboardView: View {
             }
         }
         .task {
+            guard viewModel == nil else { return }
             let vm = DashboardViewModel(vpnManager: vpnManager)
             viewModel = vm
             vm.startUpdating()

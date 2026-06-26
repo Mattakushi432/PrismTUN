@@ -86,8 +86,8 @@ xcuserdata/
 .swiftpm/
 *.resolved
 
-# sing-box binary (download separately; do not commit)
-PrismTUN/Resources/sing-box
+# sing-box binary (fetched automatically by Scripts/fetch-singbox.sh; do not commit)
+PrismTUN/Resources/Binaries/sing-box
 
 # Runtime config & logs
 *.prismtun-config-*.json

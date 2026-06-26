@@ -2,7 +2,8 @@ import Foundation
 import Network
 
 @Observable
-final class NetworkMonitor: @unchecked Sendable {
+@MainActor
+final class NetworkMonitor {
     private(set) var isConnected: Bool = true
     private(set) var connectionType: ConnectionType = .unknown
 
