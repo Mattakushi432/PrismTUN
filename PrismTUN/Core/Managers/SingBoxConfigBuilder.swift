@@ -186,12 +186,21 @@ enum SingBoxConfigBuilder {
         for rule in rules where rule.isEnabled {
             var r: [String: Any] = ["outbound": rule.outbound.rawValue]
             switch rule.type {
-            case .domain:      r["domain"] = [rule.value]
-            case .domainSuffix: r["domain_suffix"] = [rule.value]
-            case .ipCidr:      r["ip_cidr"] = [rule.value]
-            case .geosite:     r["geosite"] = rule.value
-            case .geoip:       r["geoip"] = rule.value
-            case .processName: r["process_name"] = [rule.value]
+            case .domain:        r["domain"]        = [rule.value]
+            case .domainSuffix:  r["domain_suffix"] = [rule.value]
+            case .domainKeyword: r["domain_keyword"] = [rule.value]
+            case .domainRegex:   r["domain_regex"]  = [rule.value]
+            case .ipCidr:        r["ip_cidr"]        = [rule.value]
+            case .port:          r["port"]            = rule.value
+            case .portRange:     r["port_range"]      = rule.value
+            case .processName:   r["process_name"]  = [rule.value]
+            case .processPath:   r["process_path"]  = [rule.value]
+            case .network:       r["network"]         = rule.value
+            case .geosite:       r["geosite"]         = rule.value
+            case .geoip:         r["geoip"]           = rule.value
+            case .sourceIpCidr:  r["source_ip_cidr"] = [rule.value]
+            case .user:          r["user"]            = [rule.value]
+            case .clashMode:     r["clash_mode"]      = rule.value
             }
             routeRules.append(r)
         }

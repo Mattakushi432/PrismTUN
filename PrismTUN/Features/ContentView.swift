@@ -11,6 +11,7 @@ struct ContentView: View {
             switch selectedTab {
             case .dashboard: DashboardView()
             case .profiles:  ProfileListView()
+            case .routing:   RoutingView()
             case .logs:      LogsView()
             case .settings:  SettingsView()
             }
@@ -21,6 +22,7 @@ struct ContentView: View {
     enum Tab: String, CaseIterable {
         case dashboard = "Dashboard"
         case profiles  = "Profiles"
+        case routing   = "Routing"
         case logs      = "Logs"
         case settings  = "Settings"
 
@@ -28,6 +30,7 @@ struct ContentView: View {
             switch self {
             case .dashboard: "gauge.with.dots.needle.67percent"
             case .profiles:  "server.rack"
+            case .routing:   "arrow.triangle.branch"
             case .logs:      "doc.text"
             case .settings:  "gear"
             }
