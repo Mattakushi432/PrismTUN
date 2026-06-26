@@ -17,6 +17,7 @@
 		3C682396C0C382AEB0F4458A /* SubscriptionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC08D5C15579F94697CE2A2 /* SubscriptionStore.swift */; };
 		3E70C835BB2283936F0D5722 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 770A9CC5579203809D3DACCC /* ContentView.swift */; };
 		3E73FFAEF7614EF34F65C0CF /* Subscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB8E667D7910CDD0AF684ECC /* Subscription.swift */; };
+		40F870039CDE2AA5018433B1 /* LogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F28F00DBF8A0D27870710AE7 /* LogStore.swift */; };
 		4482BCB7940597FF186D54EB /* ProxyProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C943BE22208F1E6C96CA0FE5 /* ProxyProtocol.swift */; };
 		49BB87FC600C5CC436F7564C /* RoutingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3671E9BC136FED153CDABCBD /* RoutingView.swift */; };
 		4A381EA203827D14D48BB10B /* PacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4052A9CBBC47FCAE9E8F0FF /* PacketTunnelProvider.swift */; };
@@ -84,6 +85,7 @@
 		D5D0B845F41D2AD134C5545A /* RuleEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleEditorView.swift; sourceTree = "<group>"; };
 		D7C0EA7E38A9E14104346507 /* LogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogsView.swift; sourceTree = "<group>"; };
 		DA6A29347EB71A60BCBDFB4F /* PrismTUNApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrismTUNApp.swift; sourceTree = "<group>"; };
+		F28F00DBF8A0D27870710AE7 /* LogStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogStore.swift; sourceTree = "<group>"; };
 		F87420B675DF5C92A95996BA /* ProfileListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -261,6 +263,7 @@
 			isa = PBXGroup;
 			children = (
 				AC05A67CEBE6C7A67610BDF4 /* KeychainStore.swift */,
+				F28F00DBF8A0D27870710AE7 /* LogStore.swift */,
 				924CC40EA380DCCB9A75732B /* NetworkMonitor.swift */,
 				4A6BC52F92554984F423B87D /* ProfileStore.swift */,
 				C39ABC3ADAD42E0370A530C1 /* RoutingStore.swift */,
@@ -399,6 +402,7 @@
 				914177A69C15BA9BAB25D6B4 /* DashboardViewModel.swift in Sources */,
 				7E7FB5C4EF9CBE2BA15FF189 /* KeychainStore.swift in Sources */,
 				A4BBAE87D225B08407D02037 /* LogEntry.swift in Sources */,
+				40F870039CDE2AA5018433B1 /* LogStore.swift in Sources */,
 				52C735AEDA33EAA5F2D8A4DD /* LogsView.swift in Sources */,
 				90563355C466B0F855971FEF /* LogsViewModel.swift in Sources */,
 				0094C2BE86AD9F0BA2235B81 /* MenuBarController.swift in Sources */,

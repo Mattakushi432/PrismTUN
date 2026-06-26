@@ -84,6 +84,56 @@ actor SingBoxManager {
         }
     }
 
+    // MARK: - Log Streaming
+
+    // nonisolated: no actor-isolated state accessed; apiSecret passed by caller at connect time.
+    nonisolated func logsStream(apiSecret: String) -> AsyncStream<LogEntry> {
+        AsyncStream { continuation in
+            var components = URLComponents()
+            components.scheme = "ws"
+            components.host = "127.0.0.1"
+            components.port = SingBoxConfigBuilder.apiPort
+            components.path = "/logs"
+            components.queryItems = [URLQueryItem(name: "level", value: "debug")]
+            if !apiSecret.isEmpty {
+                components.queryItems?.append(URLQueryItem(name: "token", value: apiSecret))
+            }
+            guard let url = components.url else {
+                continuation.finish()
+                return
+            }
+            var request = URLRequest(url: url)
+            if !apiSecret.isEmpty {
+                request.setValue("Bearer \(apiSecret)", forHTTPHeaderField: "Authorization")
+            }
+            let wsTask = URLSession.shared.webSocketTask(with: request)
+            wsTask.resume()
+
+            let task = Task {
+                let decoder = JSONDecoder()
+                do {
+                    while !Task.isCancelled {
+                        let message = try await wsTask.receive()
+                        guard case .string(let text) = message,
+                              let data = text.data(using: .utf8),
+                              let payload = try? decoder.decode(LogPayload.self, from: data)
+                        else { continue }
+                        let entry = LogEntry(timestamp: Date(), level: payload.level, message: payload.payload)
+                        continuation.yield(entry)
+                    }
+                } catch {
+                    // WebSocket closed or cancelled — exit cleanly
+                }
+                continuation.finish()
+            }
+
+            continuation.onTermination = { @Sendable _ in
+                task.cancel()
+                wsTask.cancel(with: .goingAway, reason: nil)
+            }
+        }
+    }
+
     // MARK: - API Calls
 
     func fetchTraffic() async -> TrafficPayload? {
