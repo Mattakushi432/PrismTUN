@@ -4,41 +4,68 @@ import AppKit
 import UniformTypeIdentifiers
 
 struct ProfileListView: View {
-    @Environment(ProfileManager.self) private var profileManager
-    @Environment(VPNManager.self) private var vpnManager
-    @State private var viewModel: ProfilesViewModel?
-    @State private var showAdd = false
-    @State private var importURI = ""
-    @State private var showImport = false
+    @Environment(ProfileManager.self)      private var profileManager
+    @Environment(VPNManager.self)          private var vpnManager
+    @Environment(SubscriptionManager.self) private var subscriptionManager
+    @State private var viewModel:  ProfilesViewModel?
+    @State private var showAdd     = false
+    @State private var importURI   = ""
+    @State private var showImport  = false
 
     var body: some View {
         Group {
             if let vm = viewModel {
-                ProfileListContent(viewModel: vm, showAdd: $showAdd, showImport: $showImport, importURI: $importURI)
+                ProfileListContent(
+                    viewModel: vm,
+                    showAdd: $showAdd,
+                    showImport: $showImport,
+                    importURI: $importURI
+                )
             }
         }
         .task {
             let vm = ProfilesViewModel(profileManager: profileManager)
             viewModel = vm
         }
-        .navigationTitle("Profiles")
+        .navigationTitle(String(localized: "Profiles"))
     }
 }
 
-// MARK: - ProfileListContent
+// MARK: - Main content
 
 private struct ProfileListContent: View {
     let viewModel: ProfilesViewModel
-    @Binding var showAdd: Bool
+    @Binding var showAdd:    Bool
     @Binding var showImport: Bool
-    @Binding var importURI: String
-    @State private var showQRScan = false
+    @Binding var importURI:  String
+
+    @Environment(SubscriptionManager.self) private var subscriptionManager
+
+    @State private var showQRScan    = false
+    @State private var showAddSub    = false
+    @State private var deletingSubID: UUID?
+
+    // MARK: Helpers
+
+    private func profiles(forSubscription id: UUID) -> [ProxyProfile] {
+        viewModel.profiles.filter { $0.subscriptionID == id }
+    }
+
+    private var manualProfiles: [ProxyProfile] {
+        viewModel.profiles.filter { $0.subscriptionID == nil }
+    }
+
+    private var isEmpty: Bool {
+        viewModel.profiles.isEmpty && subscriptionManager.subscriptions.isEmpty
+    }
+
+    // MARK: Body
 
     var body: some View {
         VStack(spacing: 0) {
             toolbar
             Divider()
-            if viewModel.profiles.isEmpty {
+            if isEmpty {
                 emptyState
             } else {
                 profileList
@@ -59,19 +86,55 @@ private struct ProfileListContent: View {
                 Task { await viewModel.importFromURI(uris.joined(separator: "\n")) }
             }
         }
+        .sheet(isPresented: $showAddSub) {
+            AddSubscriptionView { sub in
+                Task { await subscriptionManager.add(sub) }
+            }
+        }
+        .alert(
+            String(localized: "Remove Subscription"),
+            isPresented: Binding(
+                get: { deletingSubID != nil },
+                set: { if !$0 { deletingSubID = nil } }
+            )
+        ) {
+            Button(String(localized: "Remove"), role: .destructive) {
+                if let id = deletingSubID {
+                    Task { await subscriptionManager.remove(id: id) }
+                }
+                deletingSubID = nil
+            }
+            Button(String(localized: "Cancel"), role: .cancel) { deletingSubID = nil }
+        } message: {
+            Text(String(localized: "This will also delete all profiles from this subscription."))
+        }
     }
 
+    // MARK: Toolbar
+
     private var toolbar: some View {
-        HStack {
+        HStack(spacing: 8) {
             Button { showImport = true } label: {
-                Label("Import URI", systemImage: "link.badge.plus")
+                Label(String(localized: "Import URI"), systemImage: "link.badge.plus")
             }
             Button { showQRScan = true } label: {
-                Label("Scan QR", systemImage: "qrcode.viewfinder")
+                Label(String(localized: "Scan QR"), systemImage: "qrcode.viewfinder")
+            }
+            if subscriptionManager.isUpdating {
+                ProgressView().controlSize(.small)
+            } else if !subscriptionManager.subscriptions.isEmpty {
+                Button {
+                    Task { await subscriptionManager.updateAll() }
+                } label: {
+                    Label(String(localized: "Update All"), systemImage: "arrow.clockwise")
+                }
             }
             Spacer()
+            Button { showAddSub = true } label: {
+                Label(String(localized: "Add Subscription"), systemImage: "plus.rectangle.on.folder")
+            }
             Button { showAdd = true } label: {
-                Label("Add", systemImage: "plus")
+                Label(String(localized: "Add"), systemImage: "plus")
             }
             .buttonStyle(.borderedProminent)
         }
@@ -79,33 +142,132 @@ private struct ProfileListContent: View {
         .padding(.vertical, 10)
     }
 
+    // MARK: Empty state
+
     private var emptyState: some View {
-        ContentUnavailableView(
-            "No Profiles",
-            systemImage: "server.rack",
-            description: Text("Add a proxy profile or import a URI to get started")
-        )
+        ContentUnavailableView {
+            Label(String(localized: "No Profiles"), systemImage: "server.rack")
+        } description: {
+            Text(String(localized: "Add a proxy profile, import a URI, or add a subscription to get started."))
+        } actions: {
+            Button(String(localized: "Add Subscription")) { showAddSub = true }
+                .buttonStyle(.borderedProminent)
+            Button(String(localized: "Add Profile")) { showAdd = true }
+                .buttonStyle(.bordered)
+        }
     }
+
+    // MARK: List with sections
 
     private var profileList: some View {
         List {
-            ForEach(viewModel.profiles) { profile in
-                ProfileRow(
-                    profile: profile,
-                    isActive: viewModel.activeProfileID == profile.id,
-                    onSelect: { Task { await viewModel.setActive(id: profile.id) } },
-                    onDelete: { Task { await viewModel.delete(id: profile.id) } }
-                )
+            ForEach(subscriptionManager.subscriptions) { sub in
+                Section {
+                    let subProfiles = profiles(forSubscription: sub.id)
+                    if subProfiles.isEmpty {
+                        HStack(spacing: 8) {
+                            Image(systemName: "arrow.clockwise.circle")
+                                .foregroundStyle(.secondary)
+                            Text(String(localized: "No profiles — tap Update to fetch"))
+                                .foregroundStyle(.secondary)
+                                .font(.callout)
+                        }
+                        .padding(.vertical, 4)
+                    } else {
+                        ForEach(subProfiles) { profile in
+                            ProfileRow(
+                                profile: profile,
+                                isActive: viewModel.activeProfileID == profile.id,
+                                onSelect: { Task { await viewModel.setActive(id: profile.id) } },
+                                onDelete: { Task { await viewModel.delete(id: profile.id) } }
+                            )
+                        }
+                    }
+                } header: {
+                    SubscriptionSectionHeader(
+                        subscription: sub,
+                        isUpdating: subscriptionManager.isUpdating,
+                        onUpdate: { Task { await subscriptionManager.update(id: sub.id) } },
+                        onRemove: { deletingSubID = sub.id }
+                    )
+                }
+            }
+
+            if !manualProfiles.isEmpty {
+                Section(String(localized: "Manual")) {
+                    ForEach(manualProfiles) { profile in
+                        ProfileRow(
+                            profile: profile,
+                            isActive: viewModel.activeProfileID == profile.id,
+                            onSelect: { Task { await viewModel.setActive(id: profile.id) } },
+                            onDelete: { Task { await viewModel.delete(id: profile.id) } }
+                        )
+                    }
+                }
             }
         }
         .listStyle(.plain)
     }
 }
 
+// MARK: - Subscription section header
+
+private struct SubscriptionSectionHeader: View {
+    let subscription: Subscription
+    let isUpdating:   Bool
+    let onUpdate:     () -> Void
+    let onRemove:     () -> Void
+
+    private var lastUpdatedText: String {
+        guard let date = subscription.lastUpdated else {
+            return String(localized: "Never updated")
+        }
+        let fmt = RelativeDateTimeFormatter()
+        fmt.unitsStyle = .abbreviated
+        return fmt.localizedString(for: date, relativeTo: Date())
+    }
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "cloud")
+                .foregroundStyle(.secondary)
+                .font(.caption)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(subscription.name)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.primary)
+                Text("\(subscription.profileIDs.count) servers · \(lastUpdatedText)")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+            }
+            Spacer()
+            if isUpdating {
+                ProgressView().controlSize(.mini)
+            } else {
+                Button(action: onUpdate) {
+                    Image(systemName: "arrow.clockwise")
+                        .font(.caption)
+                }
+                .buttonStyle(.plain)
+                .help(String(localized: "Update subscription"))
+
+                Button(action: onRemove) {
+                    Image(systemName: "trash")
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                }
+                .buttonStyle(.plain)
+                .help(String(localized: "Remove subscription"))
+            }
+        }
+        .padding(.vertical, 2)
+    }
+}
+
 // MARK: - ProfileRow
 
 private struct ProfileRow: View {
-    let profile: ProxyProfile
+    let profile:  ProxyProfile
     let isActive: Bool
     let onSelect: () -> Void
     let onDelete: () -> Void
@@ -143,7 +305,7 @@ private struct ProfileRow: View {
                         .foregroundStyle(.tertiary)
                 }
                 .buttonStyle(.plain)
-                .help("Show QR / copy URI")
+                .help(String(localized: "Show QR / copy URI"))
                 .popover(isPresented: $showQR, arrowEdge: .trailing) {
                     QRPopoverView(profile: profile)
                 }
@@ -152,19 +314,19 @@ private struct ProfileRow: View {
         .padding(.vertical, 4)
         .swipeActions(edge: .trailing) {
             Button(role: .destructive, action: onDelete) {
-                Label("Delete", systemImage: "trash")
+                Label(String(localized: "Delete"), systemImage: "trash")
             }
         }
         .contextMenu {
-            Button("Select", action: onSelect)
+            Button(String(localized: "Select"), action: onSelect)
             if let uri = profile.toURI() {
-                Button("Copy URI") {
+                Button(String(localized: "Copy URI")) {
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(uri, forType: .string)
                 }
             }
             Divider()
-            Button("Delete", role: .destructive, action: onDelete)
+            Button(String(localized: "Delete"), role: .destructive, action: onDelete)
         }
     }
 }
@@ -201,7 +363,7 @@ private struct QRPopoverView: View {
                 }
                 .buttonStyle(.borderless)
             } else {
-                Text("No URI export for this protocol")
+                Text(String(localized: "No URI export for this protocol"))
                     .foregroundStyle(.secondary)
                     .font(.callout)
             }
@@ -211,7 +373,7 @@ private struct QRPopoverView: View {
     }
 }
 
-// MARK: - URIImportView (multi-line, live parse count, clipboard paste)
+// MARK: - URIImportView
 
 private struct URIImportView: View {
     @Binding var uri: String
@@ -225,14 +387,14 @@ private struct URIImportView: View {
     var body: some View {
         VStack(spacing: 16) {
             HStack {
-                Text("Import Proxy URIs").font(.headline)
+                Text(String(localized: "Import Proxy URIs")).font(.headline)
                 Spacer()
                 Button {
                     if let clip = NSPasteboard.general.string(forType: .string), !clip.isEmpty {
                         uri = clip
                     }
                 } label: {
-                    Label("Paste Clipboard", systemImage: "clipboard")
+                    Label(String(localized: "Paste Clipboard"), systemImage: "clipboard")
                 }
                 .buttonStyle(.borderless)
             }
@@ -256,9 +418,9 @@ private struct URIImportView: View {
             }
 
             HStack {
-                Button("Cancel") { dismiss() }
+                Button(String(localized: "Cancel")) { dismiss() }
                 Spacer()
-                Button("Import") {
+                Button(String(localized: "Import")) {
                     onImport(uri)
                     uri = ""
                     dismiss()
@@ -272,7 +434,7 @@ private struct URIImportView: View {
     }
 }
 
-// MARK: - QRScanView (file picker → CIDetector)
+// MARK: - QRScanView
 
 private struct QRScanView: View {
     let onImport: ([String]) -> Void
@@ -284,20 +446,18 @@ private struct QRScanView: View {
 
     var body: some View {
         VStack(spacing: 20) {
-            Text("Scan QR Code").font(.headline)
+            Text(String(localized: "Scan QR Code")).font(.headline)
 
             if !scanned {
                 VStack(spacing: 12) {
                     Image(systemName: "qrcode.viewfinder")
                         .font(.system(size: 48))
                         .foregroundStyle(.secondary)
-                    Text("Select an image file containing one or more proxy QR codes.")
+                    Text(String(localized: "Select an image file containing one or more proxy QR codes."))
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
-                    Button("Choose Image File…") {
-                        scanFromFile()
-                    }
-                    .buttonStyle(.borderedProminent)
+                    Button(String(localized: "Choose Image File…")) { scanFromFile() }
+                        .buttonStyle(.borderedProminent)
                     if let err = errorMessage {
                         Text(err).foregroundStyle(.red).font(.caption)
                     }
@@ -308,9 +468,9 @@ private struct QRScanView: View {
                     Image(systemName: "exclamationmark.triangle")
                         .font(.largeTitle)
                         .foregroundStyle(.orange)
-                    Text("No proxy URIs detected in the image.")
+                    Text(String(localized: "No proxy URIs detected in the image."))
                         .foregroundStyle(.secondary)
-                    Button("Try Another File") {
+                    Button(String(localized: "Try Another File")) {
                         scanned = false
                         errorMessage = nil
                     }
@@ -318,7 +478,7 @@ private struct QRScanView: View {
                 }
             } else {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Detected \(detectedURIs.count) URI(s) — select rows to import only those:")
+                    Text(String(localized: "Detected \(detectedURIs.count) URI(s) — select rows to import only those:"))
                         .font(.subheadline)
                     List(detectedURIs, id: \.self, selection: $selectedURIs) { uri in
                         Text(uri)
@@ -327,19 +487,19 @@ private struct QRScanView: View {
                     }
                     .frame(height: min(CGFloat(detectedURIs.count) * 52 + 8, 200))
                     .border(.separator)
-                    Text("Leave all unselected to import everything.")
+                    Text(String(localized: "Leave all unselected to import everything."))
                         .font(.caption2)
                         .foregroundStyle(.tertiary)
                 }
             }
 
             HStack {
-                Button("Cancel") { dismiss() }
+                Button(String(localized: "Cancel")) { dismiss() }
                 Spacer()
                 if scanned && !detectedURIs.isEmpty {
                     Button(selectedURIs.isEmpty
-                           ? "Import All (\(detectedURIs.count))"
-                           : "Import Selected (\(selectedURIs.count))") {
+                           ? String(localized: "Import All (\(detectedURIs.count))")
+                           : String(localized: "Import Selected (\(selectedURIs.count))")) {
                         let toImport = selectedURIs.isEmpty ? detectedURIs : Array(selectedURIs)
                         onImport(toImport)
                         dismiss()
@@ -356,8 +516,8 @@ private struct QRScanView: View {
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [.image]
         panel.allowsMultipleSelection = false
-        panel.message = "Select an image containing a QR code"
-        panel.prompt  = "Scan"
+        panel.message = String(localized: "Select an image containing a QR code")
+        panel.prompt  = String(localized: "Scan")
         guard panel.runModal() == .OK, let url = panel.url else { return }
 
         guard let nsImage = NSImage(contentsOf: url),

@@ -7,6 +7,7 @@ struct ProxyProfile: Identifiable, Codable, Sendable, Hashable {
     var server: String
     var port: Int
     var createdAt: Date
+    var subscriptionID: UUID?
 
     // MARK: - Shared credentials (Keychain — NOT serialised to JSON)
     var password: String    // ss password · hysteria2 auth · tuic token
@@ -52,7 +53,7 @@ struct ProxyProfile: Identifiable, Codable, Sendable, Hashable {
     // password, trojanPassword, wgPrivateKey, wgPresharedKey are absent from CodingKeys
     // so they are never written to plaintext JSON. ProfileStore populates them from Keychain.
     private enum CodingKeys: String, CodingKey {
-        case id, name, `protocol`, server, port, createdAt
+        case id, name, `protocol`, server, port, createdAt, subscriptionID
         case username, ssMethod, uuid, alterId, vmessNetwork, wsPath
         case realityPublicKey, realityShortId
         case tls, sni, skipCertVerify, fingerprint
@@ -89,6 +90,7 @@ struct ProxyProfile: Identifiable, Codable, Sendable, Hashable {
         wgPeerPublicKey       = try c.decodeIfPresent(String.self, forKey: .wgPeerPublicKey)       ?? ""
         wgLocalAddress        = try c.decodeIfPresent(String.self, forKey: .wgLocalAddress)        ?? ""
         wgMTU                 = try c.decodeIfPresent(Int.self,    forKey: .wgMTU)                 ?? 1420
+        subscriptionID        = try c.decodeIfPresent(UUID.self,   forKey: .subscriptionID)
         // Populated from Keychain by ProfileStore after decoding
         password       = ""
         trojanPassword = ""
@@ -102,7 +104,8 @@ struct ProxyProfile: Identifiable, Codable, Sendable, Hashable {
         protocol: ProxyProtocol = .shadowsocks,
         server: String = "",
         port: Int = 443,
-        createdAt: Date = Date()
+        createdAt: Date = Date(),
+        subscriptionID: UUID? = nil
     ) {
         self.id                    = id
         self.name                  = name
@@ -110,6 +113,7 @@ struct ProxyProfile: Identifiable, Codable, Sendable, Hashable {
         self.server                = server
         self.port                  = port
         self.createdAt             = createdAt
+        self.subscriptionID        = subscriptionID
         self.password              = ""
         self.username              = ""
         self.ssMethod              = .aes256gcm

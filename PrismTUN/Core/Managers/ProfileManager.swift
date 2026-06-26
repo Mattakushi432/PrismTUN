@@ -48,6 +48,25 @@ final class ProfileManager {
         activeProfileID = id
     }
 
+    func bulkAdd(_ newProfiles: [ProxyProfile]) async {
+        profiles.append(contentsOf: newProfiles)
+        await persist()
+    }
+
+    func bulkDelete(ids: Set<UUID>) async {
+        profiles.removeAll { ids.contains($0.id) }
+        if let active = activeProfileID, ids.contains(active) {
+            activeProfileID = nil
+        }
+        for id in ids {
+            KeychainStore.delete(key: "\(id.uuidString).password")
+            KeychainStore.delete(key: "\(id.uuidString).trojanPassword")
+            KeychainStore.delete(key: "\(id.uuidString).wgPrivateKey")
+            KeychainStore.delete(key: "\(id.uuidString).wgPresharedKey")
+        }
+        await persist()
+    }
+
     private func persist() async {
         let snapshot = profiles
         do {

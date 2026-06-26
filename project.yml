@@ -1,0 +1,91 @@
+name: PrismTUN
+options:
+  bundleIdPrefix: com.prismtun
+  deploymentTarget:
+    macOS: "14.0"
+  xcodeVersion: "16.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+
+targets:
+  PrismTUN:
+    type: application
+    platform: macOS
+    deploymentTarget: "14.0"
+
+    # --- Build scripts ---
+    preBuildScripts:
+      - name: "Fetch sing-box binary"
+        script: |
+          set -e
+          BINARY="${SRCROOT}/PrismTUN/Resources/Binaries/sing-box"
+          if [ ! -f "$BINARY" ] || [ ! -s "$BINARY" ]; then
+            bash "${SRCROOT}/Scripts/fetch-singbox.sh"
+          fi
+        basedOnDependencyAnalysis: false
+
+    postBuildScripts:
+      - name: "Embed sing-box in app bundle"
+        script: |
+          set -e
+          BINARY="${SRCROOT}/PrismTUN/Resources/Binaries/sing-box"
+          DEST="${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/Resources/sing-box"
+          mkdir -p "$(dirname "$DEST")"
+          cp "$BINARY" "$DEST"
+          chmod 755 "$DEST"
+          # Re-sign with app identity for hardened runtime (skip for ad-hoc "-" or unsigned)
+          if [ "${CODE_SIGNING_ALLOWED:-NO}" = "YES" ] && \
+             [ -n "${CODE_SIGN_IDENTITY:-}" ] && \
+             [ "${CODE_SIGN_IDENTITY}" != "-" ]; then
+            codesign --force --sign "${CODE_SIGN_IDENTITY}" \
+              --options runtime \
+              "${DEST}"
+          fi
+        basedOnDependencyAnalysis: false
+
+    # --- Sources ---
+    sources:
+      - path: PrismTUN
+        excludes:
+          - "Resources/Info.plist"
+          - "Resources/Binaries"   # binary embedded via postBuildScripts; not a compile source
+
+    info:
+      path: PrismTUN/Resources/Info.plist
+      properties:
+        LSUIElement: true
+        CFBundleIdentifier: com.prismtun.app
+        CFBundleName: PrismTUN
+        CFBundleShortVersionString: "1.0.0"
+        CFBundleVersion: "1"
+        NSHighResolutionCapable: true
+        NSAppleEventsUsageDescription: "PrismTUN needs to configure system proxy settings."
+
+    entitlements:
+      path: PrismTUN/Resources/PrismTUN.entitlements
+
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.prismtun.app
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_IDENTITY: "-"
+        ENABLE_HARDENED_RUNTIME: YES
+        INFOPLIST_FILE: PrismTUN/Resources/Info.plist
+
+  PacketTunnelProvider:
+    type: app-extension
+    platform: macOS
+    deploymentTarget: "14.0"
+    sources:
+      - path: PacketTunnelProvider
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.prismtun.app.tunnel
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_IDENTITY: "-"
+        ENABLE_HARDENED_RUNTIME: YES
