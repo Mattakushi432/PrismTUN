@@ -48,11 +48,11 @@ private struct ProfileListContent: View {
     // MARK: Helpers
 
     private func profiles(forSubscription id: UUID) -> [ProxyProfile] {
-        viewModel.profiles.filter { $0.subscriptionID == id }
+        viewModel.sorted(viewModel.profiles.filter { $0.subscriptionID == id })
     }
 
     private var manualProfiles: [ProxyProfile] {
-        viewModel.profiles.filter { $0.subscriptionID == nil }
+        viewModel.sorted(viewModel.profiles.filter { $0.subscriptionID == nil })
     }
 
     private var isEmpty: Bool {
@@ -129,6 +129,38 @@ private struct ProfileListContent: View {
                     Label(String(localized: "Update All"), systemImage: "arrow.clockwise")
                 }
             }
+
+            Divider().frame(height: 16)
+
+            // Latency test controls
+            if viewModel.isTesting {
+                ProgressView().controlSize(.small)
+                Button { viewModel.cancelTest() } label: {
+                    Label(String(localized: "Stop"), systemImage: "stop.circle")
+                }
+            } else if !viewModel.profiles.isEmpty {
+                Button { viewModel.testAll() } label: {
+                    Label(String(localized: "Test All"), systemImage: "bolt.horizontal")
+                }
+                .help(String(localized: "TCP-ping all servers and show latency"))
+            }
+
+            // Sort toggle
+            if !viewModel.profiles.isEmpty {
+                Toggle(isOn: Binding(
+                    get: { viewModel.sortByLatency },
+                    set: { viewModel.sortByLatency = $0 }
+                )) {
+                    Image(systemName: viewModel.sortByLatency
+                          ? "arrow.up.arrow.down.circle.fill"
+                          : "arrow.up.arrow.down.circle")
+                }
+                .toggleStyle(.button)
+                .help(String(localized: viewModel.sortByLatency
+                             ? "Currently sorted by latency — click to reset"
+                             : "Sort by latency"))
+            }
+
             Spacer()
             Button { showAddSub = true } label: {
                 Label(String(localized: "Add Subscription"), systemImage: "plus.rectangle.on.folder")
@@ -298,6 +330,8 @@ private struct ProfileRow: View {
 
             Spacer()
 
+            LatencyBadge(profile: profile)
+
             if profile.toURI() != nil {
                 Button { showQR.toggle() } label: {
                     Image(systemName: "qrcode")
@@ -328,6 +362,34 @@ private struct ProfileRow: View {
             Divider()
             Button(String(localized: "Delete"), role: .destructive, action: onDelete)
         }
+    }
+}
+
+// MARK: - LatencyBadge
+
+private struct LatencyBadge: View {
+    let profile: ProxyProfile
+
+    var body: some View {
+        if profile.lastTestedAt != nil {
+            if let ms = profile.lastLatencyMs {
+                Text("\(ms)ms")
+                    .font(.caption2.monospacedDigit())
+                    .foregroundStyle(color(ms))
+                    .padding(.horizontal, 5)
+                    .padding(.vertical, 2)
+                    .background(color(ms).opacity(0.12))
+                    .clipShape(Capsule())
+            } else {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.caption2)
+                    .foregroundStyle(.red.opacity(0.7))
+            }
+        }
+    }
+
+    private func color(_ ms: Int) -> Color {
+        ms < 100 ? .green : ms < 300 ? .yellow : .red
     }
 }
 

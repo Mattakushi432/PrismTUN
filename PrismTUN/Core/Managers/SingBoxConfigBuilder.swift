@@ -77,7 +77,7 @@ enum SingBoxConfigBuilder {
         return outbounds
     }
 
-    private static func buildProxyOutbound(profile: ProxyProfile) -> [String: Any] {
+    static func buildProxyOutbound(profile: ProxyProfile) -> [String: Any] {
         var out: [String: Any] = [
             "tag": "proxy",
             "server": profile.server,

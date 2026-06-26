@@ -9,6 +9,10 @@ struct ProxyProfile: Identifiable, Codable, Sendable, Hashable {
     var createdAt: Date
     var subscriptionID: UUID?
 
+    // MARK: - Latency testing (persisted; not sensitive)
+    var lastLatencyMs: Int?
+    var lastTestedAt: Date?
+
     // MARK: - Shared credentials (Keychain — NOT serialised to JSON)
     var password: String    // ss password · hysteria2 auth · tuic token
     var username: String
@@ -54,6 +58,7 @@ struct ProxyProfile: Identifiable, Codable, Sendable, Hashable {
     // so they are never written to plaintext JSON. ProfileStore populates them from Keychain.
     private enum CodingKeys: String, CodingKey {
         case id, name, `protocol`, server, port, createdAt, subscriptionID
+        case lastLatencyMs, lastTestedAt
         case username, ssMethod, uuid, alterId, vmessNetwork, wsPath
         case realityPublicKey, realityShortId
         case tls, sni, skipCertVerify, fingerprint
@@ -91,6 +96,8 @@ struct ProxyProfile: Identifiable, Codable, Sendable, Hashable {
         wgLocalAddress        = try c.decodeIfPresent(String.self, forKey: .wgLocalAddress)        ?? ""
         wgMTU                 = try c.decodeIfPresent(Int.self,    forKey: .wgMTU)                 ?? 1420
         subscriptionID        = try c.decodeIfPresent(UUID.self,   forKey: .subscriptionID)
+        lastLatencyMs         = try c.decodeIfPresent(Int.self,    forKey: .lastLatencyMs)
+        lastTestedAt          = try c.decodeIfPresent(Date.self,   forKey: .lastTestedAt)
         // Populated from Keychain by ProfileStore after decoding
         password       = ""
         trojanPassword = ""
@@ -114,6 +121,8 @@ struct ProxyProfile: Identifiable, Codable, Sendable, Hashable {
         self.port                  = port
         self.createdAt             = createdAt
         self.subscriptionID        = subscriptionID
+        self.lastLatencyMs         = nil
+        self.lastTestedAt          = nil
         self.password              = ""
         self.username              = ""
         self.ssMethod              = .aes256gcm

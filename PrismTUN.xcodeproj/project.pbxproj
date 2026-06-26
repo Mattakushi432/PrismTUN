@@ -36,6 +36,7 @@
 		E37636BF4B3FCC44A099E81E /* PrismTUNApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA6A29347EB71A60BCBDFB4F /* PrismTUNApp.swift */; };
 		E9E41EF44C824A52BC97F74D /* AddSubscriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6195F3292AFD4C8DD0E7BD7 /* AddSubscriptionView.swift */; };
 		EB752AFDD10C471BD5A95F05 /* ProfileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A6BC52F92554984F423B87D /* ProfileStore.swift */; };
+		EB946D0CE95A6739899453E4 /* ServerTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9101786328CD432A54D231 /* ServerTester.swift */; };
 		F531C6BE6942113A7A809BD1 /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924CC40EA380DCCB9A75732B /* NetworkMonitor.swift */; };
 /* End PBXBuildFile section */
 
@@ -66,6 +67,7 @@
 		BBA9497DBBFCD9A442559AE0 /* SingBoxConfigBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingBoxConfigBuilder.swift; sourceTree = "<group>"; };
 		C943BE22208F1E6C96CA0FE5 /* ProxyProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProxyProtocol.swift; sourceTree = "<group>"; };
 		C977BDEFEBE5360FB5236F08 /* MenuBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarController.swift; sourceTree = "<group>"; };
+		CA9101786328CD432A54D231 /* ServerTester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerTester.swift; sourceTree = "<group>"; };
 		CB8E667D7910CDD0AF684ECC /* Subscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subscription.swift; sourceTree = "<group>"; };
 		D11D32F476A9BD1F172E687F /* PrismTUN.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PrismTUN.entitlements; sourceTree = "<group>"; };
 		D3EF8A0F402E8699818509C0 /* ProfileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileManager.swift; sourceTree = "<group>"; };
@@ -125,6 +127,7 @@
 			isa = PBXGroup;
 			children = (
 				D3EF8A0F402E8699818509C0 /* ProfileManager.swift */,
+				CA9101786328CD432A54D231 /* ServerTester.swift */,
 				BBA9497DBBFCD9A442559AE0 /* SingBoxConfigBuilder.swift */,
 				50A858EA4AE7625E98A44511 /* SingBoxManager.swift */,
 				1F2BA40BD9832F5AFBB8D437 /* SubscriptionManager.swift */,
@@ -385,6 +388,7 @@
 				39851E5B16437F394BA4AE80 /* ProxyProfile.swift in Sources */,
 				4482BCB7940597FF186D54EB /* ProxyProtocol.swift in Sources */,
 				955390507BE2A9954681A4B6 /* RoutingRule.swift in Sources */,
+				EB946D0CE95A6739899453E4 /* ServerTester.swift in Sources */,
 				33D3D30D8106B9308D627E06 /* SettingsView.swift in Sources */,
 				D0EBEDA656A4FADF66FAFC8B /* SingBoxConfigBuilder.swift in Sources */,
 				0A38A673CC492FFB83F42CB7 /* SingBoxManager.swift in Sources */,
