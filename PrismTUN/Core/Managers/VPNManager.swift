@@ -9,17 +9,24 @@ final class VPNManager {
     private(set) var status: ConnectionStatus = .disconnected
     private(set) var stats: TrafficStats = .zero
     private(set) var errorMessage: String?
+    private(set) var routingRules: [RoutingRule] = []
 
     let profileManager: ProfileManager
+    private(set) var logStore: LogStore = LogStore()
     private let singBox  = SingBoxManager()
     private let sysProxy = SystemProxyManager()
     private var statsTask: Task<Void, Never>?
+    private var logsTask: Task<Void, Never>?
 
     init(profileManager: ProfileManager) {
         self.profileManager = profileManager
     }
 
-    func connect(mode: ConnectionMode = .systemProxy, rules: [RoutingRule] = []) async {
+    func updateRoutingRules(_ rules: [RoutingRule]) {
+        routingRules = rules
+    }
+
+    func connect(mode: ConnectionMode = .systemProxy) async {
         guard let profile = profileManager.activeProfile else {
             errorMessage = "No active profile selected"
             return
@@ -30,7 +37,7 @@ final class VPNManager {
         let apiSecret = UUID().uuidString
 
         do {
-            try await singBox.start(profile: profile, mode: mode, rules: rules, apiSecret: apiSecret)
+            try await singBox.start(profile: profile, mode: mode, rules: routingRules, apiSecret: apiSecret)
             if mode == .systemProxy || mode == .global {
                 try await sysProxy.enable()
             }
@@ -38,6 +45,7 @@ final class VPNManager {
             isConnected    = true
             status         = .connected
             startStatsPolling()
+            startLogsStreaming(apiSecret: apiSecret)
         } catch {
             status       = .failed
             errorMessage = error.localizedDescription
@@ -45,6 +53,8 @@ final class VPNManager {
     }
 
     func disconnect() async {
+        logsTask?.cancel()
+        logsTask = nil
         statsTask?.cancel()
         statsTask = nil
 
@@ -70,6 +80,17 @@ final class VPNManager {
             await connect(mode: mode)
         } else {
             connectionMode = mode
+        }
+    }
+
+    // MARK: - Log Streaming
+
+    private func startLogsStreaming(apiSecret: String) {
+        logsTask?.cancel()
+        logsTask = Task {
+            for await entry in singBox.logsStream(apiSecret: apiSecret) {
+                logStore.append(entry)
+            }
         }
     }
 

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0094C2BE86AD9F0BA2235B81 /* MenuBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C977BDEFEBE5360FB5236F08 /* MenuBarController.swift */; };
 		0A38A673CC492FFB83F42CB7 /* SingBoxManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A858EA4AE7625E98A44511 /* SingBoxManager.swift */; };
+		0C785525741D3339F7A695FF /* RoutingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863E23F62A926736D7576DC3 /* RoutingViewModel.swift */; };
 		135293C6B317F209FCC905A3 /* ProfileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3EF8A0F402E8699818509C0 /* ProfileManager.swift */; };
 		1DCE274E264B4F30D101783A /* SubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F2BA40BD9832F5AFBB8D437 /* SubscriptionManager.swift */; };
 		33D3D30D8106B9308D627E06 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AED553260CDE8C971A4F31D /* SettingsView.swift */; };
@@ -16,13 +17,17 @@
 		3C682396C0C382AEB0F4458A /* SubscriptionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC08D5C15579F94697CE2A2 /* SubscriptionStore.swift */; };
 		3E70C835BB2283936F0D5722 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 770A9CC5579203809D3DACCC /* ContentView.swift */; };
 		3E73FFAEF7614EF34F65C0CF /* Subscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB8E667D7910CDD0AF684ECC /* Subscription.swift */; };
+		40F870039CDE2AA5018433B1 /* LogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F28F00DBF8A0D27870710AE7 /* LogStore.swift */; };
 		4482BCB7940597FF186D54EB /* ProxyProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C943BE22208F1E6C96CA0FE5 /* ProxyProtocol.swift */; };
+		49BB87FC600C5CC436F7564C /* RoutingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3671E9BC136FED153CDABCBD /* RoutingView.swift */; };
 		4A381EA203827D14D48BB10B /* PacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4052A9CBBC47FCAE9E8F0FF /* PacketTunnelProvider.swift */; };
 		4CEE54BA2497AF27FDB446A7 /* TrafficStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268F045F3C48AEF2BD523FB2 /* TrafficStats.swift */; };
 		4D8F23D4B48FEF584522D2BC /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21FD45F378A1BF28CF472422 /* DashboardView.swift */; };
+		507BDE53A7C198AACB741A18 /* RoutingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C39ABC3ADAD42E0370A530C1 /* RoutingStore.swift */; };
 		52C735AEDA33EAA5F2D8A4DD /* LogsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7C0EA7E38A9E14104346507 /* LogsView.swift */; };
 		5DCE129CD0456DBAF002EC97 /* AddProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 715186492E8DF70BD56A58F3 /* AddProfileView.swift */; };
 		629006979F757748488BE5C1 /* ConnectionMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A686CB611DFCCD9E774920A /* ConnectionMode.swift */; };
+		75312C581A93D45CB3024160 /* RulePresets.swift in Sources */ = {isa = PBXBuildFile; fileRef = B71029C3A20BC5590F3ACB3B /* RulePresets.swift */; };
 		7657EBD2BEEA839ACE32BCE5 /* ProfileListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F87420B675DF5C92A95996BA /* ProfileListView.swift */; };
 		7E7FB5C4EF9CBE2BA15FF189 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC05A67CEBE6C7A67610BDF4 /* KeychainStore.swift */; };
 		90563355C466B0F855971FEF /* LogsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8951D8B0D1B3D0DFC377C4BE /* LogsViewModel.swift */; };
@@ -33,9 +38,11 @@
 		B505E53129BF16FA7984D9D1 /* ProfilesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D23131CD74D838F61B732C /* ProfilesViewModel.swift */; };
 		C595EEAA80FEAA7499B84EA5 /* VPNManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7D415F21BB4C21C784650FE /* VPNManager.swift */; };
 		D0EBEDA656A4FADF66FAFC8B /* SingBoxConfigBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBA9497DBBFCD9A442559AE0 /* SingBoxConfigBuilder.swift */; };
+		D4C716A841DEE5DA9DFED8E9 /* RuleEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5D0B845F41D2AD134C5545A /* RuleEditorView.swift */; };
 		E37636BF4B3FCC44A099E81E /* PrismTUNApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA6A29347EB71A60BCBDFB4F /* PrismTUNApp.swift */; };
 		E9E41EF44C824A52BC97F74D /* AddSubscriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6195F3292AFD4C8DD0E7BD7 /* AddSubscriptionView.swift */; };
 		EB752AFDD10C471BD5A95F05 /* ProfileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A6BC52F92554984F423B87D /* ProfileStore.swift */; };
+		EB946D0CE95A6739899453E4 /* ServerTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9101786328CD432A54D231 /* ServerTester.swift */; };
 		F531C6BE6942113A7A809BD1 /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924CC40EA380DCCB9A75732B /* NetworkMonitor.swift */; };
 /* End PBXBuildFile section */
 
@@ -46,6 +53,7 @@
 		1F2BA40BD9832F5AFBB8D437 /* SubscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionManager.swift; sourceTree = "<group>"; };
 		21FD45F378A1BF28CF472422 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		268F045F3C48AEF2BD523FB2 /* TrafficStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrafficStats.swift; sourceTree = "<group>"; };
+		3671E9BC136FED153CDABCBD /* RoutingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingView.swift; sourceTree = "<group>"; };
 		373A22FD807372E6ABB045C3 /* PrismTUN.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PrismTUN.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3AED553260CDE8C971A4F31D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		4A686CB611DFCCD9E774920A /* ConnectionMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionMode.swift; sourceTree = "<group>"; };
@@ -54,6 +62,7 @@
 		715186492E8DF70BD56A58F3 /* AddProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddProfileView.swift; sourceTree = "<group>"; };
 		770A9CC5579203809D3DACCC /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		836019094D6FC5CD1CB8557E /* DashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModel.swift; sourceTree = "<group>"; };
+		863E23F62A926736D7576DC3 /* RoutingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingViewModel.swift; sourceTree = "<group>"; };
 		8951D8B0D1B3D0DFC377C4BE /* LogsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogsViewModel.swift; sourceTree = "<group>"; };
 		912FD57C6C8EC6C80B02BBD0 /* RoutingRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingRule.swift; sourceTree = "<group>"; };
 		924CC40EA380DCCB9A75732B /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
@@ -62,16 +71,21 @@
 		A6195F3292AFD4C8DD0E7BD7 /* AddSubscriptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSubscriptionView.swift; sourceTree = "<group>"; };
 		ABC08D5C15579F94697CE2A2 /* SubscriptionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionStore.swift; sourceTree = "<group>"; };
 		AC05A67CEBE6C7A67610BDF4 /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
+		B71029C3A20BC5590F3ACB3B /* RulePresets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulePresets.swift; sourceTree = "<group>"; };
 		B7D415F21BB4C21C784650FE /* VPNManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNManager.swift; sourceTree = "<group>"; };
 		BBA9497DBBFCD9A442559AE0 /* SingBoxConfigBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingBoxConfigBuilder.swift; sourceTree = "<group>"; };
+		C39ABC3ADAD42E0370A530C1 /* RoutingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingStore.swift; sourceTree = "<group>"; };
 		C943BE22208F1E6C96CA0FE5 /* ProxyProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProxyProtocol.swift; sourceTree = "<group>"; };
 		C977BDEFEBE5360FB5236F08 /* MenuBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarController.swift; sourceTree = "<group>"; };
+		CA9101786328CD432A54D231 /* ServerTester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerTester.swift; sourceTree = "<group>"; };
 		CB8E667D7910CDD0AF684ECC /* Subscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subscription.swift; sourceTree = "<group>"; };
 		D11D32F476A9BD1F172E687F /* PrismTUN.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PrismTUN.entitlements; sourceTree = "<group>"; };
 		D3EF8A0F402E8699818509C0 /* ProfileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileManager.swift; sourceTree = "<group>"; };
 		D4052A9CBBC47FCAE9E8F0FF /* PacketTunnelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacketTunnelProvider.swift; sourceTree = "<group>"; };
+		D5D0B845F41D2AD134C5545A /* RuleEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleEditorView.swift; sourceTree = "<group>"; };
 		D7C0EA7E38A9E14104346507 /* LogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogsView.swift; sourceTree = "<group>"; };
 		DA6A29347EB71A60BCBDFB4F /* PrismTUNApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrismTUNApp.swift; sourceTree = "<group>"; };
+		F28F00DBF8A0D27870710AE7 /* LogStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogStore.swift; sourceTree = "<group>"; };
 		F87420B675DF5C92A95996BA /* ProfileListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -125,6 +139,7 @@
 			isa = PBXGroup;
 			children = (
 				D3EF8A0F402E8699818509C0 /* ProfileManager.swift */,
+				CA9101786328CD432A54D231 /* ServerTester.swift */,
 				BBA9497DBBFCD9A442559AE0 /* SingBoxConfigBuilder.swift */,
 				50A858EA4AE7625E98A44511 /* SingBoxManager.swift */,
 				1F2BA40BD9832F5AFBB8D437 /* SubscriptionManager.swift */,
@@ -202,6 +217,17 @@
 			path = PacketTunnelProvider;
 			sourceTree = "<group>";
 		};
+		A33B88D6AEBD1AAC1FB499B1 /* Routing */ = {
+			isa = PBXGroup;
+			children = (
+				3671E9BC136FED153CDABCBD /* RoutingView.swift */,
+				863E23F62A926736D7576DC3 /* RoutingViewModel.swift */,
+				D5D0B845F41D2AD134C5545A /* RuleEditorView.swift */,
+				B71029C3A20BC5590F3ACB3B /* RulePresets.swift */,
+			);
+			path = Routing;
+			sourceTree = "<group>";
+		};
 		A82AA717B8AA55CA12375488 /* App */ = {
 			isa = PBXGroup;
 			children = (
@@ -218,6 +244,7 @@
 				9C5AAEB1FC49A508DA7AEC9D /* Logs */,
 				673FD45D9F1935DD35F09A13 /* MenuBar */,
 				47F50E0992E2DFBCCD894AAD /* Profiles */,
+				A33B88D6AEBD1AAC1FB499B1 /* Routing */,
 				9F6C5C4F9403490751B6EC92 /* Settings */,
 				E1B5C0639263262834E2453A /* Subscriptions */,
 			);
@@ -236,8 +263,10 @@
 			isa = PBXGroup;
 			children = (
 				AC05A67CEBE6C7A67610BDF4 /* KeychainStore.swift */,
+				F28F00DBF8A0D27870710AE7 /* LogStore.swift */,
 				924CC40EA380DCCB9A75732B /* NetworkMonitor.swift */,
 				4A6BC52F92554984F423B87D /* ProfileStore.swift */,
+				C39ABC3ADAD42E0370A530C1 /* RoutingStore.swift */,
 				ABC08D5C15579F94697CE2A2 /* SubscriptionStore.swift */,
 			);
 			path = Infrastructure;
@@ -373,6 +402,7 @@
 				914177A69C15BA9BAB25D6B4 /* DashboardViewModel.swift in Sources */,
 				7E7FB5C4EF9CBE2BA15FF189 /* KeychainStore.swift in Sources */,
 				A4BBAE87D225B08407D02037 /* LogEntry.swift in Sources */,
+				40F870039CDE2AA5018433B1 /* LogStore.swift in Sources */,
 				52C735AEDA33EAA5F2D8A4DD /* LogsView.swift in Sources */,
 				90563355C466B0F855971FEF /* LogsViewModel.swift in Sources */,
 				0094C2BE86AD9F0BA2235B81 /* MenuBarController.swift in Sources */,
@@ -385,6 +415,12 @@
 				39851E5B16437F394BA4AE80 /* ProxyProfile.swift in Sources */,
 				4482BCB7940597FF186D54EB /* ProxyProtocol.swift in Sources */,
 				955390507BE2A9954681A4B6 /* RoutingRule.swift in Sources */,
+				507BDE53A7C198AACB741A18 /* RoutingStore.swift in Sources */,
+				49BB87FC600C5CC436F7564C /* RoutingView.swift in Sources */,
+				0C785525741D3339F7A695FF /* RoutingViewModel.swift in Sources */,
+				D4C716A841DEE5DA9DFED8E9 /* RuleEditorView.swift in Sources */,
+				75312C581A93D45CB3024160 /* RulePresets.swift in Sources */,
+				EB946D0CE95A6739899453E4 /* ServerTester.swift in Sources */,
 				33D3D30D8106B9308D627E06 /* SettingsView.swift in Sources */,
 				D0EBEDA656A4FADF66FAFC8B /* SingBoxConfigBuilder.swift in Sources */,
 				0A38A673CC492FFB83F42CB7 /* SingBoxManager.swift in Sources */,

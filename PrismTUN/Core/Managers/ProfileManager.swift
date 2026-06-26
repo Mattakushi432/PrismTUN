@@ -67,6 +67,17 @@ final class ProfileManager {
         await persist()
     }
 
+    /// Updates latency in-memory only — call `persistLatencies()` after batch testing completes.
+    func updateLatencyInMemory(id: UUID, latencyMs: Int?) {
+        guard let idx = profiles.firstIndex(where: { $0.id == id }) else { return }
+        profiles[idx].lastLatencyMs = latencyMs
+        profiles[idx].lastTestedAt  = Date()
+    }
+
+    func persistLatencies() async {
+        await persist()
+    }
+
     private func persist() async {
         let snapshot = profiles
         do {
