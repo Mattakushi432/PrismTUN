@@ -29,7 +29,7 @@ struct AddProfileView: View {
                 }
             }
         }
-        .frame(width: 520, height: 640)
+        .frame(width: 520, height: 680)
     }
 
     private var generalSection: some View {
@@ -68,6 +68,7 @@ struct AddProfileView: View {
                 }
                 SecureField("Password", text: $profile.password)
             }
+
         case .vmess, .vless:
             Section(profile.protocol == .vmess ? "VMess" : "VLESS") {
                 TextField("UUID", text: $profile.uuid)
@@ -89,27 +90,102 @@ struct AddProfileView: View {
                     TextField("WS Path", text: $profile.wsPath)
                 }
             }
+
         case .trojan:
             Section("Trojan") {
                 SecureField("Password", text: $profile.trojanPassword)
             }
+
         case .socks5, .http:
             Section("Authentication (optional)") {
                 TextField("Username", text: $profile.username)
                 SecureField("Password", text: $profile.password)
+            }
+
+        case .hysteria2:
+            Section("Hysteria2") {
+                SecureField("Auth Password (optional)", text: $profile.password)
+                HStack {
+                    Text("Upload (Mbps)")
+                    Spacer()
+                    TextField("0", value: $profile.hysteria2UpMbps, format: .number)
+                        .multilineTextAlignment(.trailing)
+                        .frame(width: 60)
+                }
+                HStack {
+                    Text("Download (Mbps)")
+                    Spacer()
+                    TextField("0", value: $profile.hysteria2DownMbps, format: .number)
+                        .multilineTextAlignment(.trailing)
+                        .frame(width: 60)
+                }
+            }
+
+        case .tuic:
+            Section("TUIC") {
+                TextField("UUID", text: $profile.uuid)
+                SecureField("Token", text: $profile.password)
+                Picker("Congestion Control", selection: $profile.tuicCongestionControl) {
+                    Text("BBR").tag("bbr")
+                    Text("Cubic").tag("cubic")
+                    Text("New Reno").tag("new_reno")
+                }
+                Picker("UDP Relay Mode", selection: $profile.tuicUdpRelayMode) {
+                    Text("Native").tag("native")
+                    Text("QUIC").tag("quic")
+                }
+            }
+
+        case .wireguard:
+            Section("WireGuard") {
+                SecureField("Private Key", text: $profile.wgPrivateKey)
+                TextField("Peer Public Key", text: $profile.wgPeerPublicKey)
+                SecureField("Preshared Key (optional)", text: $profile.wgPresharedKey)
+                TextField("Local Address (e.g. 10.0.0.1/32)", text: $profile.wgLocalAddress)
+                HStack {
+                    Text("MTU")
+                    Spacer()
+                    TextField("1420", value: $profile.wgMTU, format: .number)
+                        .multilineTextAlignment(.trailing)
+                        .frame(width: 60)
+                }
             }
         }
     }
 
     @ViewBuilder
     private var tlsSection: some View {
+        // hysteria2 and tuic always use TLS — no toggle needed
+        let alwaysTLS  = profile.protocol == .hysteria2 || profile.protocol == .tuic
+        let hasReality = profile.protocol == .vless
+
         if profile.protocol.requiresEncryption {
             Section("TLS") {
-                Toggle("Enable TLS", isOn: $profile.tls)
-                if profile.tls {
+                if !alwaysTLS {
+                    Toggle("Enable TLS", isOn: $profile.tls)
+                }
+                let tlsActive = profile.tls || alwaysTLS
+                if tlsActive {
                     TextField("SNI (optional)", text: $profile.sni)
                     Toggle("Skip Certificate Verification", isOn: $profile.skipCertVerify)
-                    TextField("uTLS Fingerprint (optional)", text: $profile.fingerprint)
+                    if profile.skipCertVerify {
+                        Label(
+                            "Warning: disabling certificate verification exposes your connection to man-in-the-middle attacks. Only use this for testing.",
+                            systemImage: "exclamationmark.triangle.fill"
+                        )
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                    }
+                    if !alwaysTLS {
+                        TextField("uTLS Fingerprint (optional)", text: $profile.fingerprint)
+                    }
+                }
+            }
+
+            if hasReality && profile.tls {
+                Section("Reality") {
+                    TextField("Public Key (pbk)", text: $profile.realityPublicKey)
+                    TextField("Short ID (sid, optional)", text: $profile.realityShortId)
                 }
             }
         }

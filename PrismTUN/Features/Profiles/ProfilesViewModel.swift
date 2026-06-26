@@ -32,8 +32,14 @@ final class ProfilesViewModel {
         await profileManager.setActive(id: id)
     }
 
-    func importFromURI(_ uri: String) async {
-        guard let profile = ProxyProfile.parse(uri: uri) else { return }
-        await profileManager.add(profile)
+    /// Parses one or more newline-separated proxy URIs and adds them.
+    /// Returns the number of successfully imported profiles.
+    @discardableResult
+    func importFromURI(_ text: String) async -> Int {
+        let profiles = ProxyProfile.batchParse(text: text)
+        for profile in profiles {
+            await profileManager.add(profile)
+        }
+        return profiles.count
     }
 }

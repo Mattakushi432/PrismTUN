@@ -5,16 +5,17 @@ enum SingBoxConfigBuilder {
     static let mixedPort: Int = 2080
     static let apiPort: Int   = 9090
 
-    static func build(profile: ProxyProfile, mode: ConnectionMode, rules: [RoutingRule]) -> [String: Any] {
-        var config: [String: Any] = [
+    static func build(profile: ProxyProfile, mode: ConnectionMode, rules: [RoutingRule], apiSecret: String) -> [String: Any] {
+        let config: [String: Any] = [
             "log": [
                 "level": "info",
                 "timestamp": true
             ],
             "experimental": [
                 "clash_api": [
-                    "external_controller": "127.0.0.1:\(apiPort)",
-                    "access_control_allow_origin": ["*"]
+                    "external_controller":         "127.0.0.1:\(apiPort)",
+                    "secret":                      apiSecret,
+                    "access_control_allow_origin": ["http://127.0.0.1:\(apiPort)"]
                 ]
             ],
             "dns": buildDNS(),
@@ -135,6 +136,34 @@ enum SingBoxConfigBuilder {
                 out["username"] = profile.username
                 out["password"] = profile.password
             }
+
+        case .hysteria2:
+            out["type"] = "hysteria2"
+            out["password"] = profile.password
+            if profile.hysteria2UpMbps > 0   { out["up_mbps"]   = profile.hysteria2UpMbps }
+            if profile.hysteria2DownMbps > 0 { out["down_mbps"] = profile.hysteria2DownMbps }
+            out["tls"] = buildTLS(profile: profile)
+
+        case .tuic:
+            out["type"] = "tuic"
+            out["uuid"] = profile.uuid
+            out["password"] = profile.password
+            out["congestion_control"] = profile.tuicCongestionControl
+            out["udp_relay_mode"] = profile.tuicUdpRelayMode
+            out["tls"] = buildTLS(profile: profile)
+
+        case .wireguard:
+            out["type"] = "wireguard"
+            out["private_key"] = profile.wgPrivateKey
+            out["peer_public_key"] = profile.wgPeerPublicKey
+            if !profile.wgPresharedKey.isEmpty { out["pre_shared_key"] = profile.wgPresharedKey }
+            if !profile.wgLocalAddress.isEmpty {
+                out["local_address"] = profile.wgLocalAddress
+                    .components(separatedBy: ",")
+                    .map { $0.trimmingCharacters(in: .whitespaces) }
+                    .filter { !$0.isEmpty }
+            }
+            out["mtu"] = profile.wgMTU
         }
 
         return out
