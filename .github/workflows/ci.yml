@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build
+    runs-on: macos-15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode 16
+        run: |
+          XCODE=$(ls -d /Applications/Xcode_16*.app 2>/dev/null | sort -V | tail -1)
+          echo "Using $XCODE"
+          sudo xcode-select -s "$XCODE/Contents/Developer"
+          xcodebuild -version
+
+      - name: Install xcodegen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Cache sing-box binary
+        id: cache-singbox
+        uses: actions/cache@v4
+        with:
+          path: PrismTUN/Resources/Binaries/sing-box
+          key: sing-box-${{ hashFiles('Scripts/fetch-singbox.sh') }}
+
+      - name: Fetch sing-box binary
+        if: steps.cache-singbox.outputs.cache-hit != 'true'
+        run: bash Scripts/fetch-singbox.sh
+
+      - name: Build (Debug · ad-hoc signed)
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project PrismTUN.xcodeproj \
+            -scheme PrismTUN \
+            -destination 'platform=macOS,arch=arm64' \
+            -configuration Debug \
+            ONLY_ACTIVE_ARCH=YES \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=YES \
+            build \
+          | xcpretty
