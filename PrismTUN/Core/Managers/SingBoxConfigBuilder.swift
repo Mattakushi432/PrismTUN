@@ -1,5 +1,10 @@
 import Foundation
 
+struct GeoPaths: Sendable {
+    let geoip: String
+    let geosite: String
+}
+
 /// Generates a sing-box JSON configuration from a proxy profile.
 enum SingBoxConfigBuilder {
     static let mixedPort: Int = 2080
@@ -10,6 +15,7 @@ enum SingBoxConfigBuilder {
         mode: ConnectionMode,
         rules: [RoutingRule],
         dnsConfig: DNSConfig = .default,
+        geoPaths: GeoPaths? = nil,
         apiSecret: String
     ) -> [String: Any] {
         let config: [String: Any] = [
@@ -27,7 +33,7 @@ enum SingBoxConfigBuilder {
             "dns": buildDNS(config: dnsConfig),
             "inbounds": buildInbounds(mode: mode),
             "outbounds": buildOutbounds(profile: profile, mode: mode),
-            "route": buildRoute(mode: mode, rules: rules)
+            "route": buildRoute(mode: mode, rules: rules, geoPaths: geoPaths)
         ]
         return config
     }
@@ -228,7 +234,7 @@ enum SingBoxConfigBuilder {
         return tls
     }
 
-    private static func buildRoute(mode: ConnectionMode, rules: [RoutingRule]) -> [String: Any] {
+    private static func buildRoute(mode: ConnectionMode, rules: [RoutingRule], geoPaths: GeoPaths? = nil) -> [String: Any] {
         var routeRules: [[String: Any]] = [
             ["protocol": "dns", "outbound": "dns-out"]
         ]
@@ -270,10 +276,17 @@ enum SingBoxConfigBuilder {
         case .direct:                     finalOutbound = "direct"
         }
 
-        return [
+        var route: [String: Any] = [
             "rules": routeRules,
             "final": finalOutbound,
             "auto_detect_interface": true
         ]
+
+        if let paths = geoPaths {
+            route["geoip"]   = ["path": paths.geoip]
+            route["geosite"] = ["path": paths.geosite]
+        }
+
+        return route
     }
 }

@@ -8,6 +8,7 @@ struct PrismTUNApp: App {
     @State private var subscriptionManager: SubscriptionManager
     @State private var routingViewModel:    RoutingViewModel
     @State private var dnsViewModel:        DNSViewModel
+    @State private var geoAssetViewModel:   GeoAssetViewModel
     @State private var menuBarController:   MenuBarController?
 
     @AppStorage("appColorScheme") private var colorSchemeRaw = "system"
@@ -25,11 +26,13 @@ struct PrismTUNApp: App {
         let sm = SubscriptionManager(profileManager: pm)
         let rv = RoutingViewModel(vpnManager: vm)
         let dv = DNSViewModel(vpnManager: vm)
+        let gv = GeoAssetViewModel()
         _profileManager      = State(initialValue: pm)
         _vpnManager          = State(initialValue: vm)
         _subscriptionManager = State(initialValue: sm)
         _routingViewModel    = State(initialValue: rv)
         _dnsViewModel        = State(initialValue: dv)
+        _geoAssetViewModel   = State(initialValue: gv)
         _menuBarController   = State(initialValue: MenuBarController(vpnManager: vm))
     }
 
@@ -41,6 +44,7 @@ struct PrismTUNApp: App {
                 .environment(subscriptionManager)
                 .environment(routingViewModel)
                 .environment(dnsViewModel)
+                .environment(geoAssetViewModel)
                 .frame(minWidth: 800, minHeight: 560)
                 .preferredColorScheme(resolvedColorScheme)
                 .task {
@@ -51,6 +55,12 @@ struct PrismTUNApp: App {
                     await subscriptionManager.load()
                     await routingViewModel.load()
                     await dnsViewModel.load()
+
+                    if UserDefaults.standard.bool(forKey: "geoAutoUpdate") {
+                        await geoAssetViewModel.updateIfNeeded()
+                    } else {
+                        await geoAssetViewModel.load()
+                    }
 
                     if UserDefaults.standard.bool(forKey: "autoConnect") {
                         await vpnManager.connect()
@@ -68,6 +78,7 @@ struct PrismTUNApp: App {
             .environment(subscriptionManager)
             .environment(routingViewModel)
             .environment(dnsViewModel)
+            .environment(geoAssetViewModel)
             .preferredColorScheme(resolvedColorScheme)
         }
     }

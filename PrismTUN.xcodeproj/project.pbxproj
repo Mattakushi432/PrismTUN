@@ -25,6 +25,7 @@
 		3E73FFAEF7614EF34F65C0CF /* Subscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB8E667D7910CDD0AF684ECC /* Subscription.swift */; };
 		40F870039CDE2AA5018433B1 /* LogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F28F00DBF8A0D27870710AE7 /* LogStore.swift */; };
 		4482BCB7940597FF186D54EB /* ProxyProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C943BE22208F1E6C96CA0FE5 /* ProxyProtocol.swift */; };
+		48AA6B8C407196B3B36FC246 /* GeoAssetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A31C31D533A6B7E58AF89613 /* GeoAssetManager.swift */; };
 		49BB87FC600C5CC436F7564C /* RoutingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3671E9BC136FED153CDABCBD /* RoutingView.swift */; };
 		4A381EA203827D14D48BB10B /* PacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4052A9CBBC47FCAE9E8F0FF /* PacketTunnelProvider.swift */; };
 		4CEE54BA2497AF27FDB446A7 /* TrafficStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268F045F3C48AEF2BD523FB2 /* TrafficStats.swift */; };
@@ -51,6 +52,7 @@
 		A084B0ED4BABAD92F88E716F /* ProxyProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C943BE22208F1E6C96CA0FE5 /* ProxyProtocol.swift */; };
 		A4BBAE87D225B08407D02037 /* LogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 925C53DC499AC299D8559BF3 /* LogEntry.swift */; };
 		B505E53129BF16FA7984D9D1 /* ProfilesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D23131CD74D838F61B732C /* ProfilesViewModel.swift */; };
+		BD9897D44F6BC776DB18E4C3 /* GeoSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4025303417416DB53D1C24EC /* GeoSettingsView.swift */; };
 		C2A1D69F49943218417CF1B1 /* RoutingRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912FD57C6C8EC6C80B02BBD0 /* RoutingRule.swift */; };
 		C595EEAA80FEAA7499B84EA5 /* VPNManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7D415F21BB4C21C784650FE /* VPNManager.swift */; };
 		C6A79085D1D6C43963E9304B /* ConnectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 694E736522F5B12C44DC60C3 /* ConnectionsView.swift */; };
@@ -105,6 +107,7 @@
 		3671E9BC136FED153CDABCBD /* RoutingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingView.swift; sourceTree = "<group>"; };
 		373A22FD807372E6ABB045C3 /* PrismTUN.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PrismTUN.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3AED553260CDE8C971A4F31D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		4025303417416DB53D1C24EC /* GeoSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoSettingsView.swift; sourceTree = "<group>"; };
 		4A686CB611DFCCD9E774920A /* ConnectionMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionMode.swift; sourceTree = "<group>"; };
 		4A6BC52F92554984F423B87D /* ProfileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileStore.swift; sourceTree = "<group>"; };
 		4D573152162D60F0AA89C298 /* DNSStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSStore.swift; sourceTree = "<group>"; };
@@ -123,6 +126,7 @@
 		925C53DC499AC299D8559BF3 /* LogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEntry.swift; sourceTree = "<group>"; };
 		98D23131CD74D838F61B732C /* ProfilesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilesViewModel.swift; sourceTree = "<group>"; };
 		9B69F1502227F5BF896FAED7 /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
+		A31C31D533A6B7E58AF89613 /* GeoAssetManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoAssetManager.swift; sourceTree = "<group>"; };
 		A6195F3292AFD4C8DD0E7BD7 /* AddSubscriptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSubscriptionView.swift; sourceTree = "<group>"; };
 		A748B287492522FD060F182D /* PrismTUN.Debug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PrismTUN.Debug.entitlements; sourceTree = "<group>"; };
 		A8F81A356CDF7BA288E27921 /* DNSSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSSettingsView.swift; sourceTree = "<group>"; };
@@ -207,6 +211,7 @@
 		6E910F808E974301F380D5CF /* Managers */ = {
 			isa = PBXGroup;
 			children = (
+				A31C31D533A6B7E58AF89613 /* GeoAssetManager.swift */,
 				D3EF8A0F402E8699818509C0 /* ProfileManager.swift */,
 				CA9101786328CD432A54D231 /* ServerTester.swift */,
 				BBA9497DBBFCD9A442559AE0 /* SingBoxConfigBuilder.swift */,
@@ -278,6 +283,7 @@
 			children = (
 				A8F81A356CDF7BA288E27921 /* DNSSettingsView.swift */,
 				8DB47A6B88950634C0C1BEB2 /* DNSViewModel.swift */,
+				4025303417416DB53D1C24EC /* GeoSettingsView.swift */,
 				3AED553260CDE8C971A4F31D /* SettingsView.swift */,
 				9B69F1502227F5BF896FAED7 /* UpdateChecker.swift */,
 			);
@@ -491,6 +497,8 @@
 				E04B7F66DFFF838982FC22F0 /* DNSViewModel.swift in Sources */,
 				4D8F23D4B48FEF584522D2BC /* DashboardView.swift in Sources */,
 				914177A69C15BA9BAB25D6B4 /* DashboardViewModel.swift in Sources */,
+				48AA6B8C407196B3B36FC246 /* GeoAssetManager.swift in Sources */,
+				BD9897D44F6BC776DB18E4C3 /* GeoSettingsView.swift in Sources */,
 				7E7FB5C4EF9CBE2BA15FF189 /* KeychainStore.swift in Sources */,
 				A4BBAE87D225B08407D02037 /* LogEntry.swift in Sources */,
 				40F870039CDE2AA5018433B1 /* LogStore.swift in Sources */,

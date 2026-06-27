@@ -36,6 +36,7 @@ actor SingBoxManager {
         mode: ConnectionMode,
         rules: [RoutingRule],
         dnsConfig: DNSConfig = .default,
+        geoPaths: GeoPaths? = nil,
         apiSecret: String
     ) async throws {
         if isRunning { try await stop() }
@@ -44,7 +45,7 @@ actor SingBoxManager {
 
         let binaryURL = try binaryPath()
         await clearQuarantineOnce(url: binaryURL)
-        let config    = SingBoxConfigBuilder.build(profile: profile, mode: mode, rules: rules, dnsConfig: dnsConfig, apiSecret: apiSecret)
+        let config    = SingBoxConfigBuilder.build(profile: profile, mode: mode, rules: rules, dnsConfig: dnsConfig, geoPaths: geoPaths, apiSecret: apiSecret)
         let cfgURL    = try writeConfig(config)
         configURL = cfgURL
 

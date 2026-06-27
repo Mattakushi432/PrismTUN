@@ -52,9 +52,10 @@ final class VPNManager {
         }
 
         let apiSecret = UUID().uuidString
+        let geoPaths  = await GeoAssetManager.shared.geoPaths()
 
         do {
-            try await singBox.start(profile: profile, mode: mode, rules: routingRules, dnsConfig: dnsConfig, apiSecret: apiSecret)
+            try await singBox.start(profile: profile, mode: mode, rules: routingRules, dnsConfig: dnsConfig, geoPaths: geoPaths, apiSecret: apiSecret)
             if mode == .systemProxy || mode == .global {
                 try await sysProxy.enable()
             }

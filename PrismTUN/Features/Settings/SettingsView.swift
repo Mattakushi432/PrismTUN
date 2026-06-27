@@ -28,6 +28,7 @@ struct SettingsView: View {
             appearanceSection
             proxySection
             dnsSection
+            geoSection
             loggingSection
             updatesSection
             dangerZoneSection
@@ -139,6 +140,18 @@ struct SettingsView: View {
                 Label(
                     String(localized: "DNS Servers & Rules"),
                     systemImage: "network.badge.shield.half.filled"
+                )
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var geoSection: some View {
+        Section(String(localized: "Geo Assets")) {
+            NavigationLink(destination: GeoSettingsView()) {
+                Label(
+                    String(localized: "GeoIP & GeoSite Databases"),
+                    systemImage: "map"
                 )
             }
         }
