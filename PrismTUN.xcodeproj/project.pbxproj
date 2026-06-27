@@ -46,6 +46,7 @@
 		914177A69C15BA9BAB25D6B4 /* DashboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 836019094D6FC5CD1CB8557E /* DashboardViewModel.swift */; };
 		955390507BE2A9954681A4B6 /* RoutingRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912FD57C6C8EC6C80B02BBD0 /* RoutingRule.swift */; };
 		99FA580320A6ABD0DD7F9BA1 /* PacketTunnelProvider.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1D4D851A01F66E44C8171C60 /* PacketTunnelProvider.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		99FB916E76BF56DFDFA22C8A /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B69F1502227F5BF896FAED7 /* UpdateChecker.swift */; };
 		9AF7D39C0F0660589E45B0A4 /* SingBoxConfigBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBA9497DBBFCD9A442559AE0 /* SingBoxConfigBuilder.swift */; };
 		A084B0ED4BABAD92F88E716F /* ProxyProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C943BE22208F1E6C96CA0FE5 /* ProxyProtocol.swift */; };
 		A4BBAE87D225B08407D02037 /* LogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 925C53DC499AC299D8559BF3 /* LogEntry.swift */; };
@@ -108,6 +109,7 @@
 		4A6BC52F92554984F423B87D /* ProfileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileStore.swift; sourceTree = "<group>"; };
 		4D573152162D60F0AA89C298 /* DNSStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSStore.swift; sourceTree = "<group>"; };
 		50A858EA4AE7625E98A44511 /* SingBoxManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingBoxManager.swift; sourceTree = "<group>"; };
+		58974B9013E4415BEC87AB2C /* PacketTunnelProvider.Debug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PacketTunnelProvider.Debug.entitlements; sourceTree = "<group>"; };
 		686BF62C4FCBC76898C59293 /* ConnectionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionStore.swift; sourceTree = "<group>"; };
 		694E736522F5B12C44DC60C3 /* ConnectionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionsView.swift; sourceTree = "<group>"; };
 		715186492E8DF70BD56A58F3 /* AddProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddProfileView.swift; sourceTree = "<group>"; };
@@ -120,7 +122,9 @@
 		924CC40EA380DCCB9A75732B /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
 		925C53DC499AC299D8559BF3 /* LogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEntry.swift; sourceTree = "<group>"; };
 		98D23131CD74D838F61B732C /* ProfilesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilesViewModel.swift; sourceTree = "<group>"; };
+		9B69F1502227F5BF896FAED7 /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
 		A6195F3292AFD4C8DD0E7BD7 /* AddSubscriptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSubscriptionView.swift; sourceTree = "<group>"; };
+		A748B287492522FD060F182D /* PrismTUN.Debug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PrismTUN.Debug.entitlements; sourceTree = "<group>"; };
 		A8F81A356CDF7BA288E27921 /* DNSSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSSettingsView.swift; sourceTree = "<group>"; };
 		ABC08D5C15579F94697CE2A2 /* SubscriptionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionStore.swift; sourceTree = "<group>"; };
 		AC05A67CEBE6C7A67610BDF4 /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
@@ -227,6 +231,7 @@
 		81E424E92001AD92E14833E5 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				A748B287492522FD060F182D /* PrismTUN.Debug.entitlements */,
 				D11D32F476A9BD1F172E687F /* PrismTUN.entitlements */,
 			);
 			path = Resources;
@@ -274,6 +279,7 @@
 				A8F81A356CDF7BA288E27921 /* DNSSettingsView.swift */,
 				8DB47A6B88950634C0C1BEB2 /* DNSViewModel.swift */,
 				3AED553260CDE8C971A4F31D /* SettingsView.swift */,
+				9B69F1502227F5BF896FAED7 /* UpdateChecker.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -281,6 +287,7 @@
 		A3025FECEEBF19DCCF4B449D /* PacketTunnelProvider */ = {
 			isa = PBXGroup;
 			children = (
+				58974B9013E4415BEC87AB2C /* PacketTunnelProvider.Debug.entitlements */,
 				0D1BD0C35632F7AE7B17892F /* PacketTunnelProvider.entitlements */,
 				D4052A9CBBC47FCAE9E8F0FF /* PacketTunnelProvider.swift */,
 				C7B5CD75ED8AF387C52C58D3 /* TunnelMessage.swift */,
@@ -514,6 +521,7 @@
 				9105D8D0298D9614BD3520E4 /* SystemProxyManager.swift in Sources */,
 				4CEE54BA2497AF27FDB446A7 /* TrafficStats.swift in Sources */,
 				C6C4A48792CCC3B74FC55390 /* TunnelMessage.swift in Sources */,
+				99FB916E76BF56DFDFA22C8A /* UpdateChecker.swift in Sources */,
 				C595EEAA80FEAA7499B84EA5 /* VPNManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -552,7 +560,8 @@
 		2735BA48736ACB2354A16BA9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = PacketTunnelProvider/PacketTunnelProvider.entitlements;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_ENTITLEMENTS = PacketTunnelProvider/PacketTunnelProvider.Debug.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -573,7 +582,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = PrismTUN/Resources/PrismTUN.entitlements;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_ENTITLEMENTS = PrismTUN/Resources/PrismTUN.Debug.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -593,7 +603,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = PacketTunnelProvider/PacketTunnelProvider.entitlements;
-				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -733,7 +742,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = PrismTUN/Resources/PrismTUN.entitlements;
-				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_HARDENED_RUNTIME = YES;

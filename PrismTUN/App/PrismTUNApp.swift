@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 @main
@@ -9,7 +10,16 @@ struct PrismTUNApp: App {
     @State private var dnsViewModel:        DNSViewModel
     @State private var menuBarController:   MenuBarController?
 
+    @AppStorage("appColorScheme") private var colorSchemeRaw = "system"
+    @AppStorage("showInDock")     private var showInDock     = false
+
     init() {
+        // Apply saved language preference before any localized strings load
+        let savedLang = UserDefaults.standard.string(forKey: "appLanguage") ?? "system"
+        if savedLang != "system" {
+            UserDefaults.standard.set([savedLang], forKey: "AppleLanguages")
+        }
+
         let pm = ProfileManager()
         let vm = VPNManager(profileManager: pm)
         let sm = SubscriptionManager(profileManager: pm)
@@ -32,11 +42,19 @@ struct PrismTUNApp: App {
                 .environment(routingViewModel)
                 .environment(dnsViewModel)
                 .frame(minWidth: 800, minHeight: 560)
+                .preferredColorScheme(resolvedColorScheme)
                 .task {
+                    // Restore dock icon visibility from saved preference (LSUIElement starts app as .accessory)
+                    NSApp.setActivationPolicy(showInDock ? .regular : .accessory)
+
                     await profileManager.load()
                     await subscriptionManager.load()
                     await routingViewModel.load()
                     await dnsViewModel.load()
+
+                    if UserDefaults.standard.bool(forKey: "autoConnect") {
+                        await vpnManager.connect()
+                    }
                 }
         }
         .windowStyle(.hiddenTitleBar)
@@ -50,6 +68,15 @@ struct PrismTUNApp: App {
             .environment(subscriptionManager)
             .environment(routingViewModel)
             .environment(dnsViewModel)
+            .preferredColorScheme(resolvedColorScheme)
+        }
+    }
+
+    private var resolvedColorScheme: ColorScheme? {
+        switch colorSchemeRaw {
+        case "light": return .light
+        case "dark":  return .dark
+        default:      return nil
         }
     }
 }

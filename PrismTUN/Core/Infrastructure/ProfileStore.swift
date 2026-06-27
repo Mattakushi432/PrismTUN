@@ -1,11 +1,15 @@
 import Foundation
 
 actor ProfileStore {
+    static var directoryURL: URL {
+        let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        return support.appendingPathComponent("PrismTUN")
+    }
+
     private let fileURL: URL
 
     init() {
-        let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        let dir = support.appendingPathComponent("PrismTUN")
+        let dir = ProfileStore.directoryURL
         do {
             try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         } catch {
