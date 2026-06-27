@@ -79,6 +79,7 @@
 		E37636BF4B3FCC44A099E81E /* PrismTUNApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA6A29347EB71A60BCBDFB4F /* PrismTUNApp.swift */; };
 		E77A67678FC26F5F028C532F /* SingBoxManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A858EA4AE7625E98A44511 /* SingBoxManager.swift */; };
 		E9E41EF44C824A52BC97F74D /* AddSubscriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6195F3292AFD4C8DD0E7BD7 /* AddSubscriptionView.swift */; };
+		EAC41F952E1CA84BD07DF66C /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4BAB90D347CCD23DA50E47C /* AboutView.swift */; };
 		EB752AFDD10C471BD5A95F05 /* ProfileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A6BC52F92554984F423B87D /* ProfileStore.swift */; };
 		EB946D0CE95A6739899453E4 /* ServerTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9101786328CD432A54D231 /* ServerTester.swift */; };
 		F03A21D9070B7227F2A0F354 /* ActiveConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057EA61177369CEFC9987B98 /* ActiveConnection.swift */; };
@@ -155,6 +156,7 @@
 		AC05A67CEBE6C7A67610BDF4 /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
 		AC36A0243DA703B30B2271CB /* DNSConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSConfig.swift; sourceTree = "<group>"; };
 		B43C301536BFDD05193AA154 /* ConnectionsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionsViewModel.swift; sourceTree = "<group>"; };
+		B4BAB90D347CCD23DA50E47C /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		B71029C3A20BC5590F3ACB3B /* RulePresets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulePresets.swift; sourceTree = "<group>"; };
 		B7D415F21BB4C21C784650FE /* VPNManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNManager.swift; sourceTree = "<group>"; };
 		BBA9497DBBFCD9A442559AE0 /* SingBoxConfigBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingBoxConfigBuilder.swift; sourceTree = "<group>"; };
@@ -176,6 +178,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		09C1C610F2F4FA504A3EAFF5 /* About */ = {
+			isa = PBXGroup;
+			children = (
+				B4BAB90D347CCD23DA50E47C /* AboutView.swift */,
+			);
+			path = About;
+			sourceTree = "<group>";
+		};
 		398E11DD7BE1298AC5491CF6 /* Connections */ = {
 			isa = PBXGroup;
 			children = (
@@ -360,6 +370,7 @@
 			isa = PBXGroup;
 			children = (
 				770A9CC5579203809D3DACCC /* ContentView.swift */,
+				09C1C610F2F4FA504A3EAFF5 /* About */,
 				398E11DD7BE1298AC5491CF6 /* Connections */,
 				5F4D45D58C4E951FDED2F0AE /* Dashboard */,
 				9C5AAEB1FC49A508DA7AEC9D /* Logs */,
@@ -559,6 +570,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EAC41F952E1CA84BD07DF66C /* AboutView.swift in Sources */,
 				F03A21D9070B7227F2A0F354 /* ActiveConnection.swift in Sources */,
 				5DCE129CD0456DBAF002EC97 /* AddProfileView.swift in Sources */,
 				E9E41EF44C824A52BC97F74D /* AddSubscriptionView.swift in Sources */,

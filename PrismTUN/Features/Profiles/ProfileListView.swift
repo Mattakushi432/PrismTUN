@@ -27,6 +27,9 @@ struct ProfileListView: View {
             let vm = ProfilesViewModel(profileManager: profileManager)
             viewModel = vm
         }
+        .onReceive(NotificationCenter.default.publisher(for: .newProfileRequested)) { _ in
+            showAdd = true
+        }
         .navigationTitle(String(localized: "Profiles"))
     }
 }

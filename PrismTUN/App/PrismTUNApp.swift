@@ -68,6 +68,26 @@ struct PrismTUNApp: App {
                 }
         }
         .windowStyle(.hiddenTitleBar)
+        .commands {
+            CommandGroup(replacing: .appInfo) {
+                Button(String(localized: "About PrismTUN")) {
+                    NotificationCenter.default.post(name: .showAbout, object: nil)
+                }
+            }
+            CommandGroup(after: .newItem) {
+                Button(String(localized: "New Profile")) {
+                    NotificationCenter.default.post(name: .newProfileRequested, object: nil)
+                }
+                .keyboardShortcut("n", modifiers: .command)
+            }
+        }
+
+        Window(String(localized: "About PrismTUN"), id: "about") {
+            AboutView()
+                .fixedSize()
+        }
+        .windowStyle(.hiddenTitleBar)
+        .windowResizability(.contentSize)
 
         Settings {
             NavigationStack {

@@ -1,7 +1,13 @@
 import SwiftUI
 
+extension Notification.Name {
+    static let showAbout         = Notification.Name("PrismTUN.showAbout")
+    static let newProfileRequested = Notification.Name("PrismTUN.newProfileRequested")
+}
+
 struct ContentView: View {
     @Environment(VPNManager.self) private var vpnManager
+    @Environment(\.openWindow) private var openWindow
     @State private var selectedTab: Tab = .dashboard
 
     var body: some View {
@@ -21,6 +27,34 @@ struct ContentView: View {
             }
         }
         .navigationTitle("PrismTUN")
+        .background(keyboardShortcuts)
+        .onReceive(NotificationCenter.default.publisher(for: .showAbout)) { _ in
+            openWindow(id: "about")
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .newProfileRequested)) { _ in
+            selectedTab = .profiles
+        }
+    }
+
+    private var keyboardShortcuts: some View {
+        Group {
+            ForEach(Array(ContentView.Tab.allCases.enumerated()), id: \.offset) { idx, tab in
+                Button("") { selectedTab = tab }
+                    .keyboardShortcut(KeyEquivalent(Character("\(idx + 1)")), modifiers: .command)
+                    .opacity(0)
+                    .frame(width: 0, height: 0)
+            }
+            Button("") {
+                if vpnManager.isConnected {
+                    Task { await vpnManager.disconnect() }
+                } else {
+                    Task { await vpnManager.connect() }
+                }
+            }
+            .keyboardShortcut("k", modifiers: .command)
+            .opacity(0)
+            .frame(width: 0, height: 0)
+        }
     }
 
     enum Tab: String, CaseIterable {

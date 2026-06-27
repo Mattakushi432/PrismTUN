@@ -77,20 +77,29 @@ private struct StatusCard: View {
                 }
 
                 HStack(spacing: 12) {
-                    if viewModel.isConnected {
+                    switch viewModel.status {
+                    case .connecting:
+                        HStack(spacing: 8) {
+                            ProgressView()
+                                .controlSize(.small)
+                            Text(String(localized: "Connecting…"))
+                                .foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: .infinity)
+                    case .connected:
                         Button(role: .destructive) {
                             Task { await viewModel.disconnect() }
                         } label: {
-                            Label("Disconnect", systemImage: "stop.circle")
+                            Label(String(localized: "Disconnect"), systemImage: "stop.circle")
                                 .frame(maxWidth: .infinity)
                         }
                         .controlSize(.large)
                         .buttonStyle(.bordered)
-                    } else {
+                    default:
                         Button {
                             Task { await viewModel.connect() }
                         } label: {
-                            Label("Connect", systemImage: "play.circle.fill")
+                            Label(String(localized: "Connect"), systemImage: "play.circle.fill")
                                 .frame(maxWidth: .infinity)
                         }
                         .controlSize(.large)
