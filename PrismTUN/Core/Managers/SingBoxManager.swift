@@ -247,13 +247,24 @@ actor SingBoxManager {
     }
 
     private func binaryPath() throws -> URL {
-        guard let url = Bundle.main.url(forResource: "sing-box", withExtension: nil) else {
+        // Primary: find in main bundle Resources (works for the app target)
+        if let url = Bundle.main.url(forResource: "sing-box", withExtension: nil) {
+            try? FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: url.path)
+            return url
+        }
+        // Fallback: when compiled into the PacketTunnelProvider extension, Bundle.main is the
+        // .appex bundle at .../PrismTUN.app/Contents/PlugIns/PacketTunnelProvider.appex.
+        // Navigate two levels up to reach the host app's Contents directory.
+        let appContents = Bundle.main.bundleURL
+            .deletingLastPathComponent()  // PlugIns
+            .deletingLastPathComponent()  // Contents
+            .appendingPathComponent("Contents")
+        let fallback = appContents.appendingPathComponent("Resources/sing-box")
+        guard FileManager.default.fileExists(atPath: fallback.path) else {
             throw SingBoxError.binaryNotFound
         }
-        // posixPermissions = 0o755 confirmed; if codesigning prevents the write the OS will
-        // surface the error at process launch, not here.
-        try? FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: url.path)
-        return url
+        try? FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: fallback.path)
+        return fallback
     }
 
     private func writeConfig(_ config: [String: Any]) throws -> URL {

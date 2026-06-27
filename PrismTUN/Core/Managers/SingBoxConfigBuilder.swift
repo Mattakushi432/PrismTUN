@@ -25,7 +25,7 @@ enum SingBoxConfigBuilder {
                 ]
             ],
             "dns": buildDNS(config: dnsConfig),
-            "inbounds": buildInbounds(),
+            "inbounds": buildInbounds(mode: mode),
             "outbounds": buildOutbounds(profile: profile, mode: mode),
             "route": buildRoute(mode: mode, rules: rules)
         ]
@@ -74,14 +74,31 @@ enum SingBoxConfigBuilder {
         return dns
     }
 
-    private static func buildInbounds() -> [[String: Any]] {
-        [[
+    private static func buildInbounds(mode: ConnectionMode) -> [[String: Any]] {
+        var inbounds: [[String: Any]] = []
+
+        if mode == .tun {
+            // TUN interface for full-traffic capture (auto_route handles system routing)
+            inbounds.append([
+                "type": "tun",
+                "tag": "tun-in",
+                "interface_name": "utun123",
+                "inet4_address": "172.19.0.1/30",
+                "auto_route": true,
+                "strict_route": true,
+                "sniff": true
+            ])
+        }
+
+        inbounds.append([
             "type": "mixed",
             "tag": "mixed-in",
             "listen": "127.0.0.1",
             "listen_port": mixedPort,
             "sniff": true
-        ]]
+        ])
+
+        return inbounds
     }
 
     private static func buildOutbounds(profile: ProxyProfile, mode: ConnectionMode) -> [[String: Any]] {
@@ -97,6 +114,7 @@ enum SingBoxConfigBuilder {
         switch mode {
         case .systemProxy: finalTag = "proxy"
         case .global:      finalTag = "proxy"
+        case .tun:         finalTag = "proxy"
         case .direct:      finalTag = "direct"
         }
 
@@ -248,8 +266,8 @@ enum SingBoxConfigBuilder {
 
         let finalOutbound: String
         switch mode {
-        case .systemProxy, .global: finalOutbound = "proxy"
-        case .direct:               finalOutbound = "direct"
+        case .systemProxy, .global, .tun: finalOutbound = "proxy"
+        case .direct:                     finalOutbound = "direct"
         }
 
         return [
