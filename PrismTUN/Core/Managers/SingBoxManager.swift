@@ -31,14 +31,20 @@ actor SingBoxManager {
 
     // MARK: - Lifecycle
 
-    func start(profile: ProxyProfile, mode: ConnectionMode, rules: [RoutingRule], apiSecret: String) async throws {
+    func start(
+        profile: ProxyProfile,
+        mode: ConnectionMode,
+        rules: [RoutingRule],
+        dnsConfig: DNSConfig = .default,
+        apiSecret: String
+    ) async throws {
         if isRunning { try await stop() }
 
         self.apiSecret = apiSecret
 
         let binaryURL = try binaryPath()
         await clearQuarantineOnce(url: binaryURL)
-        let config    = SingBoxConfigBuilder.build(profile: profile, mode: mode, rules: rules, apiSecret: apiSecret)
+        let config    = SingBoxConfigBuilder.build(profile: profile, mode: mode, rules: rules, dnsConfig: dnsConfig, apiSecret: apiSecret)
         let cfgURL    = try writeConfig(config)
         configURL = cfgURL
 
@@ -82,6 +88,67 @@ actor SingBoxManager {
             try? FileManager.default.removeItem(at: url)
             configURL = nil
         }
+    }
+
+    // MARK: - Connections API
+
+    // nonisolated: mirrors logsStream pattern — apiSecret supplied by caller, no actor state accessed.
+    nonisolated func connectionsStream(apiSecret: String) -> AsyncStream<[ActiveConnection]> {
+        AsyncStream { continuation in
+            var components = URLComponents()
+            components.scheme = "ws"
+            components.host = "127.0.0.1"
+            components.port = SingBoxConfigBuilder.apiPort
+            components.path = "/connections"
+            if !apiSecret.isEmpty {
+                components.queryItems = [URLQueryItem(name: "token", value: apiSecret)]
+            }
+            guard let url = components.url else {
+                continuation.finish()
+                return
+            }
+            var request = URLRequest(url: url)
+            if !apiSecret.isEmpty {
+                request.setValue("Bearer \(apiSecret)", forHTTPHeaderField: "Authorization")
+            }
+            let wsTask = URLSession.shared.webSocketTask(with: request)
+            wsTask.resume()
+
+            let task = Task {
+                let decoder = JSONDecoder()
+                do {
+                    while !Task.isCancelled {
+                        let message = try await wsTask.receive()
+                        guard case .string(let text) = message,
+                              let data = text.data(using: .utf8),
+                              let payload = try? decoder.decode(ConnectionsPayload.self, from: data),
+                              let connections = payload.connections
+                        else { continue }
+                        continuation.yield(connections)
+                    }
+                } catch {}
+                continuation.finish()
+            }
+
+            continuation.onTermination = { @Sendable _ in
+                task.cancel()
+                wsTask.cancel(with: .goingAway, reason: nil)
+            }
+        }
+    }
+
+    func closeConnection(id: String) async {
+        guard let url = URL(string: "/connections/\(id)", relativeTo: apiBase) else { return }
+        var req = authorizedRequest(url: url)
+        req.httpMethod = "DELETE"
+        _ = try? await URLSession.shared.data(for: req)
+    }
+
+    func closeAllConnections() async {
+        guard let url = URL(string: "/connections", relativeTo: apiBase) else { return }
+        var req = authorizedRequest(url: url)
+        req.httpMethod = "DELETE"
+        _ = try? await URLSession.shared.data(for: req)
     }
 
     // MARK: - Log Streaming
@@ -180,13 +247,24 @@ actor SingBoxManager {
     }
 
     private func binaryPath() throws -> URL {
-        guard let url = Bundle.main.url(forResource: "sing-box", withExtension: nil) else {
+        // Primary: find in main bundle Resources (works for the app target)
+        if let url = Bundle.main.url(forResource: "sing-box", withExtension: nil) {
+            try? FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: url.path)
+            return url
+        }
+        // Fallback: when compiled into the PacketTunnelProvider extension, Bundle.main is the
+        // .appex bundle at .../PrismTUN.app/Contents/PlugIns/PacketTunnelProvider.appex.
+        // Navigate two levels up to reach the host app's Contents directory.
+        let appContents = Bundle.main.bundleURL
+            .deletingLastPathComponent()  // PlugIns
+            .deletingLastPathComponent()  // Contents
+            .appendingPathComponent("Contents")
+        let fallback = appContents.appendingPathComponent("Resources/sing-box")
+        guard FileManager.default.fileExists(atPath: fallback.path) else {
             throw SingBoxError.binaryNotFound
         }
-        // posixPermissions = 0o755 confirmed; if codesigning prevents the write the OS will
-        // surface the error at process launch, not here.
-        try? FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: url.path)
-        return url
+        try? FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: fallback.path)
+        return fallback
     }
 
     private func writeConfig(_ config: [String: Any]) throws -> URL {

@@ -54,6 +54,12 @@ targets:
         excludes:
           - "Resources/Info.plist"
           - "Resources/Binaries"   # binary embedded via postBuildScripts; not a compile source
+      - path: PacketTunnelProvider/TunnelMessage.swift   # shared IPC type used by VPNManager
+
+    # --- Extension embedding ---
+    dependencies:
+      - target: PacketTunnelProvider
+        embed: true
 
     info:
       path: PrismTUN/Resources/Info.plist
@@ -66,26 +72,52 @@ targets:
         NSHighResolutionCapable: true
         NSAppleEventsUsageDescription: "PrismTUN needs to configure system proxy settings."
 
-    entitlements:
-      path: PrismTUN/Resources/PrismTUN.entitlements
-
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.prismtun.app
         CODE_SIGN_STYLE: Automatic
-        CODE_SIGN_IDENTITY: "-"
         ENABLE_HARDENED_RUNTIME: YES
         INFOPLIST_FILE: PrismTUN/Resources/Info.plist
+      configs:
+        Debug:
+          # Stripped entitlements — no NE capability, so any Apple ID can sign locally
+          CODE_SIGN_ENTITLEMENTS: PrismTUN/Resources/PrismTUN.Debug.entitlements
+          CODE_SIGN_IDENTITY: "-"
+          CODE_SIGNING_REQUIRED: "NO"
+        Release:
+          CODE_SIGN_ENTITLEMENTS: PrismTUN/Resources/PrismTUN.entitlements
 
   PacketTunnelProvider:
     type: app-extension
     platform: macOS
     deploymentTarget: "14.0"
+
+    # Shared sources: models + config builder + manager compiled into the extension
     sources:
       - path: PacketTunnelProvider
+        excludes:
+          - "Info.plist"           # referenced separately via info.path
+      - path: PrismTUN/Core/Models
+      - path: PrismTUN/Core/Managers/SingBoxConfigBuilder.swift
+      - path: PrismTUN/Core/Managers/SingBoxManager.swift
+
+    info:
+      path: PacketTunnelProvider/Info.plist
+      properties:
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.networkextension.packet-tunnel
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).PacketTunnelProvider
+
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.prismtun.app.tunnel
         CODE_SIGN_STYLE: Automatic
-        CODE_SIGN_IDENTITY: "-"
         ENABLE_HARDENED_RUNTIME: YES
+        INFOPLIST_FILE: PacketTunnelProvider/Info.plist
+      configs:
+        Debug:
+          CODE_SIGN_ENTITLEMENTS: PacketTunnelProvider/PacketTunnelProvider.Debug.entitlements
+          CODE_SIGN_IDENTITY: "-"
+          CODE_SIGNING_REQUIRED: "NO"
+        Release:
+          CODE_SIGN_ENTITLEMENTS: PacketTunnelProvider/PacketTunnelProvider.entitlements
