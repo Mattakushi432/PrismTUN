@@ -76,7 +76,6 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.prismtun.app
         CODE_SIGN_STYLE: Automatic
-        CODE_SIGN_IDENTITY: "-"
         ENABLE_HARDENED_RUNTIME: YES
         INFOPLIST_FILE: PrismTUN/Resources/Info.plist
         # Manage entitlements file manually so xcodegen does not overwrite it
@@ -107,7 +106,6 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.prismtun.app.tunnel
         CODE_SIGN_STYLE: Automatic
-        CODE_SIGN_IDENTITY: "-"
         ENABLE_HARDENED_RUNTIME: YES
         INFOPLIST_FILE: PacketTunnelProvider/Info.plist
         # Manage entitlements file manually so xcodegen does not overwrite it
