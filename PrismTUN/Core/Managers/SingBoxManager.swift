@@ -31,14 +31,20 @@ actor SingBoxManager {
 
     // MARK: - Lifecycle
 
-    func start(profile: ProxyProfile, mode: ConnectionMode, rules: [RoutingRule], apiSecret: String) async throws {
+    func start(
+        profile: ProxyProfile,
+        mode: ConnectionMode,
+        rules: [RoutingRule],
+        dnsConfig: DNSConfig = .default,
+        apiSecret: String
+    ) async throws {
         if isRunning { try await stop() }
 
         self.apiSecret = apiSecret
 
         let binaryURL = try binaryPath()
         await clearQuarantineOnce(url: binaryURL)
-        let config    = SingBoxConfigBuilder.build(profile: profile, mode: mode, rules: rules, apiSecret: apiSecret)
+        let config    = SingBoxConfigBuilder.build(profile: profile, mode: mode, rules: rules, dnsConfig: dnsConfig, apiSecret: apiSecret)
         let cfgURL    = try writeConfig(config)
         configURL = cfgURL
 

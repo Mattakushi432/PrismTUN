@@ -10,6 +10,7 @@ final class VPNManager {
     private(set) var stats: TrafficStats = .zero
     private(set) var errorMessage: String?
     private(set) var routingRules: [RoutingRule] = []
+    private(set) var dnsConfig: DNSConfig = .default
 
     let profileManager: ProfileManager
     private(set) var logStore: LogStore = LogStore()
@@ -28,6 +29,10 @@ final class VPNManager {
         routingRules = rules
     }
 
+    func updateDNSConfig(_ config: DNSConfig) {
+        dnsConfig = config
+    }
+
     func connect(mode: ConnectionMode = .systemProxy) async {
         guard let profile = profileManager.activeProfile else {
             errorMessage = "No active profile selected"
@@ -39,7 +44,7 @@ final class VPNManager {
         let apiSecret = UUID().uuidString
 
         do {
-            try await singBox.start(profile: profile, mode: mode, rules: routingRules, apiSecret: apiSecret)
+            try await singBox.start(profile: profile, mode: mode, rules: routingRules, dnsConfig: dnsConfig, apiSecret: apiSecret)
             if mode == .systemProxy || mode == .global {
                 try await sysProxy.enable()
             }

@@ -26,6 +26,12 @@ struct SettingsView: View {
                 }
             }
 
+            Section("DNS") {
+                NavigationLink(destination: DNSSettingsView()) {
+                    Label(String(localized: "DNS Servers & Rules"), systemImage: "network.badge.shield.half.filled")
+                }
+            }
+
             Section("Logging") {
                 Picker("Log Level", selection: $logLevel) {
                     ForEach(["debug", "info", "warn", "error"], id: \.self) {

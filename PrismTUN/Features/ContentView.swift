@@ -14,7 +14,10 @@ struct ContentView: View {
             case .routing:      RoutingView()
             case .connections:  ConnectionsView()
             case .logs:         LogsView()
-            case .settings:     SettingsView()
+            case .settings:
+                NavigationStack {
+                    SettingsView()
+                }
             }
         }
         .navigationTitle("PrismTUN")

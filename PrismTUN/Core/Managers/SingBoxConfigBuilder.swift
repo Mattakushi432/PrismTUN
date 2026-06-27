@@ -5,7 +5,13 @@ enum SingBoxConfigBuilder {
     static let mixedPort: Int = 2080
     static let apiPort: Int   = 9090
 
-    static func build(profile: ProxyProfile, mode: ConnectionMode, rules: [RoutingRule], apiSecret: String) -> [String: Any] {
+    static func build(
+        profile: ProxyProfile,
+        mode: ConnectionMode,
+        rules: [RoutingRule],
+        dnsConfig: DNSConfig = .default,
+        apiSecret: String
+    ) -> [String: Any] {
         let config: [String: Any] = [
             "log": [
                 "level": "info",
@@ -18,7 +24,7 @@ enum SingBoxConfigBuilder {
                     "access_control_allow_origin": ["http://127.0.0.1:\(apiPort)"]
                 ]
             ],
-            "dns": buildDNS(),
+            "dns": buildDNS(config: dnsConfig),
             "inbounds": buildInbounds(),
             "outbounds": buildOutbounds(profile: profile, mode: mode),
             "route": buildRoute(mode: mode, rules: rules)
@@ -28,17 +34,44 @@ enum SingBoxConfigBuilder {
 
     // MARK: - Private
 
-    private static func buildDNS() -> [String: Any] {
-        [
-            "servers": [
-                ["tag": "google", "address": "8.8.8.8"],
-                ["tag": "local",  "address": "local", "detour": "direct"]
-            ],
-            "rules": [
-                ["geosite": "cn", "server": "local"]
-            ],
-            "final": "google"
+    private static func buildDNS(config: DNSConfig) -> [String: Any] {
+        var servers: [[String: Any]] = config.servers.map { server in
+            var entry: [String: Any] = ["tag": server.tag, "address": server.address]
+            if !server.detour.isEmpty { entry["detour"] = server.detour }
+            return entry
+        }
+
+        // Inject fakeip server entry when FakeIP is enabled and not already declared
+        if config.fakeIP.isEnabled && !config.servers.contains(where: { $0.address == "fakeip" }) {
+            servers.append(["tag": "fakeip", "address": "fakeip"])
+        }
+
+        let dnsRules: [[String: Any]] = config.rules.compactMap { rule -> [String: Any]? in
+            guard rule.isEnabled else { return nil }
+            switch rule.ruleType {
+            case .geosite: return ["geosite": rule.value,   "server": rule.serverTag]
+            case .geoip:   return ["geoip":   rule.value,   "server": rule.serverTag]
+            case .domain:  return ["domain":  [rule.value], "server": rule.serverTag]
+            case .ipCidr:  return ["ip_cidr": [rule.value], "server": rule.serverTag]
+            }
+        }
+
+        var dns: [String: Any] = [
+            "servers":  servers,
+            "rules":    dnsRules,
+            "final":    config.finalServer,
+            "strategy": config.strategy.rawValue
         ]
+
+        if config.fakeIP.isEnabled {
+            dns["fakeip"] = [
+                "enabled":     true,
+                "inet4_range": config.fakeIP.inet4Range,
+                "inet6_range": config.fakeIP.inet6Range
+            ]
+        }
+
+        return dns
     }
 
     private static func buildInbounds() -> [[String: Any]] {
