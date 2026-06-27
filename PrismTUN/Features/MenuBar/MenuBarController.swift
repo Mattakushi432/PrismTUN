@@ -27,10 +27,6 @@ final class MenuBarController: NSObject {
         startObserving()
     }
 
-    deinit {
-        connectingTimer?.invalidate()
-    }
-
     // MARK: - Setup
 
     private func setupStatusItem() {
