@@ -96,50 +96,11 @@ final class SubscriptionManager {
     }
 
     private func parse(data: Data, subscription: Subscription) -> [ProxyProfile] {
-        guard let text = String(data: data, encoding: .utf8) else { return [] }
-        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-
-        // 1. Try base64-encoded list of URIs
-        if let decoded = base64Decode(trimmed) {
-            let profiles = ProxyProfile.batchParse(text: decoded)
-            if !profiles.isEmpty {
-                return applyFilters(profiles, subscription: subscription)
-            }
-        }
-
-        // 2. Plain-text newline-separated URIs
-        let profiles = ProxyProfile.batchParse(text: text)
-        return applyFilters(profiles, subscription: subscription)
-    }
-
-    private func applyFilters(_ profiles: [ProxyProfile], subscription: Subscription) -> [ProxyProfile] {
-        var result = profiles
-        if !subscription.includeRegex.isEmpty,
-           let regex = try? NSRegularExpression(pattern: subscription.includeRegex) {
-            result = result.filter { profile in
-                let range = NSRange(profile.name.startIndex..., in: profile.name)
-                return regex.firstMatch(in: profile.name, range: range) != nil
-            }
-        }
-        if !subscription.excludeRegex.isEmpty,
-           let regex = try? NSRegularExpression(pattern: subscription.excludeRegex) {
-            result = result.filter { profile in
-                let range = NSRange(profile.name.startIndex..., in: profile.name)
-                return regex.firstMatch(in: profile.name, range: range) == nil
-            }
-        }
-        return result
-    }
-
-    private func base64Decode(_ string: String) -> String? {
-        var padded = string
-            .replacingOccurrences(of: "-", with: "+")
-            .replacingOccurrences(of: "_", with: "/")
-            .replacingOccurrences(of: "\n", with: "")
-            .replacingOccurrences(of: "\r", with: "")
-        while padded.count % 4 != 0 { padded += "=" }
-        guard let d = Data(base64Encoded: padded) else { return nil }
-        return String(data: d, encoding: .utf8)
+        SubscriptionParser.parse(
+            data: data,
+            includeRegex: subscription.includeRegex,
+            excludeRegex: subscription.excludeRegex
+        )
     }
 
     // MARK: - Auto-update scheduling

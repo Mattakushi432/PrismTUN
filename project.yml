@@ -87,6 +87,22 @@ targets:
         Release:
           CODE_SIGN_ENTITLEMENTS: PrismTUN/Resources/PrismTUN.entitlements
 
+  PrismTUNTests:
+    type: bundle.unit-test
+    platform: macOS
+    deploymentTarget: "14.0"
+    sources:
+      - path: PrismTUNTests
+      - path: PrismTUN/Core/Models
+      - path: PrismTUN/Core/Managers/SingBoxConfigBuilder.swift
+      - path: PrismTUN/Core/Managers/SubscriptionParser.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.prismtun.tests
+        SWIFT_VERSION: "6.0"
+        CODE_SIGNING_ALLOWED: "NO"
+        CODE_SIGNING_REQUIRED: "NO"
+
   PacketTunnelProvider:
     type: app-extension
     platform: macOS
