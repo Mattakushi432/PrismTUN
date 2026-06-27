@@ -78,8 +78,14 @@ targets:
         CODE_SIGN_STYLE: Automatic
         ENABLE_HARDENED_RUNTIME: YES
         INFOPLIST_FILE: PrismTUN/Resources/Info.plist
-        # Manage entitlements file manually so xcodegen does not overwrite it
-        CODE_SIGN_ENTITLEMENTS: PrismTUN/Resources/PrismTUN.entitlements
+      configs:
+        Debug:
+          # Stripped entitlements — no NE capability, so any Apple ID can sign locally
+          CODE_SIGN_ENTITLEMENTS: PrismTUN/Resources/PrismTUN.Debug.entitlements
+          CODE_SIGN_IDENTITY: "-"
+          CODE_SIGNING_REQUIRED: "NO"
+        Release:
+          CODE_SIGN_ENTITLEMENTS: PrismTUN/Resources/PrismTUN.entitlements
 
   PacketTunnelProvider:
     type: app-extension
@@ -108,5 +114,10 @@ targets:
         CODE_SIGN_STYLE: Automatic
         ENABLE_HARDENED_RUNTIME: YES
         INFOPLIST_FILE: PacketTunnelProvider/Info.plist
-        # Manage entitlements file manually so xcodegen does not overwrite it
-        CODE_SIGN_ENTITLEMENTS: PacketTunnelProvider/PacketTunnelProvider.entitlements
+      configs:
+        Debug:
+          CODE_SIGN_ENTITLEMENTS: PacketTunnelProvider/PacketTunnelProvider.Debug.entitlements
+          CODE_SIGN_IDENTITY: "-"
+          CODE_SIGNING_REQUIRED: "NO"
+        Release:
+          CODE_SIGN_ENTITLEMENTS: PacketTunnelProvider/PacketTunnelProvider.entitlements
