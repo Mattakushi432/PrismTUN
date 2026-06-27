@@ -9,30 +9,33 @@ struct ContentView: View {
             SidebarView(selectedTab: $selectedTab)
         } detail: {
             switch selectedTab {
-            case .dashboard: DashboardView()
-            case .profiles:  ProfileListView()
-            case .routing:   RoutingView()
-            case .logs:      LogsView()
-            case .settings:  SettingsView()
+            case .dashboard:    DashboardView()
+            case .profiles:     ProfileListView()
+            case .routing:      RoutingView()
+            case .connections:  ConnectionsView()
+            case .logs:         LogsView()
+            case .settings:     SettingsView()
             }
         }
         .navigationTitle("PrismTUN")
     }
 
     enum Tab: String, CaseIterable {
-        case dashboard = "Dashboard"
-        case profiles  = "Profiles"
-        case routing   = "Routing"
-        case logs      = "Logs"
-        case settings  = "Settings"
+        case dashboard   = "Dashboard"
+        case profiles    = "Profiles"
+        case routing     = "Routing"
+        case connections = "Connections"
+        case logs        = "Logs"
+        case settings    = "Settings"
 
         var icon: String {
             switch self {
-            case .dashboard: "gauge.with.dots.needle.67percent"
-            case .profiles:  "server.rack"
-            case .routing:   "arrow.triangle.branch"
-            case .logs:      "doc.text"
-            case .settings:  "gear"
+            case .dashboard:   "gauge.with.dots.needle.67percent"
+            case .profiles:    "server.rack"
+            case .routing:     "arrow.triangle.branch"
+            case .connections: "network"
+            case .logs:        "doc.text"
+            case .settings:    "gear"
             }
         }
     }

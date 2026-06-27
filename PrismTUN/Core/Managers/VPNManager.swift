@@ -13,10 +13,12 @@ final class VPNManager {
 
     let profileManager: ProfileManager
     private(set) var logStore: LogStore = LogStore()
+    private(set) var connectionStore: ConnectionStore = ConnectionStore()
     private let singBox  = SingBoxManager()
     private let sysProxy = SystemProxyManager()
     private var statsTask: Task<Void, Never>?
     private var logsTask: Task<Void, Never>?
+    private var connectionsTask: Task<Void, Never>?
 
     init(profileManager: ProfileManager) {
         self.profileManager = profileManager
@@ -46,6 +48,7 @@ final class VPNManager {
             status         = .connected
             startStatsPolling()
             startLogsStreaming(apiSecret: apiSecret)
+            startConnectionsStreaming(apiSecret: apiSecret)
         } catch {
             status       = .failed
             errorMessage = error.localizedDescription
@@ -53,6 +56,9 @@ final class VPNManager {
     }
 
     func disconnect() async {
+        connectionsTask?.cancel()
+        connectionsTask = nil
+        connectionStore.clear()
         logsTask?.cancel()
         logsTask = nil
         statsTask?.cancel()
@@ -81,6 +87,25 @@ final class VPNManager {
         } else {
             connectionMode = mode
         }
+    }
+
+    // MARK: - Connections Streaming
+
+    private func startConnectionsStreaming(apiSecret: String) {
+        connectionsTask?.cancel()
+        connectionsTask = Task {
+            for await connections in singBox.connectionsStream(apiSecret: apiSecret) {
+                connectionStore.update(connections)
+            }
+        }
+    }
+
+    func closeConnection(id: String) async {
+        await singBox.closeConnection(id: id)
+    }
+
+    func closeAllConnections() async {
+        await singBox.closeAllConnections()
     }
 
     // MARK: - Log Streaming
