@@ -4,13 +4,15 @@ import AppKit
 import UniformTypeIdentifiers
 
 struct ProfileListView: View {
+    @Binding var openAddSheet: Bool
+
     @Environment(ProfileManager.self)      private var profileManager
     @Environment(VPNManager.self)          private var vpnManager
     @Environment(SubscriptionManager.self) private var subscriptionManager
-    @State private var viewModel:  ProfilesViewModel?
-    @State private var showAdd     = false
-    @State private var importURI   = ""
-    @State private var showImport  = false
+    @State private var viewModel: ProfilesViewModel?
+    @State private var showAdd    = false
+    @State private var importURI  = ""
+    @State private var showImport = false
 
     var body: some View {
         Group {
@@ -21,14 +23,28 @@ struct ProfileListView: View {
                     showImport: $showImport,
                     importURI: $importURI
                 )
+            } else {
+                ProgressView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
         .task {
-            let vm = ProfilesViewModel(profileManager: profileManager)
-            viewModel = vm
+            guard viewModel == nil else { return }
+            viewModel = ProfilesViewModel(profileManager: profileManager)
         }
-        .onReceive(NotificationCenter.default.publisher(for: .newProfileRequested)) { _ in
-            showAdd = true
+        // Sheet lives here so it fires even before viewModel is set
+        .sheet(isPresented: $showAdd) {
+            AddProfileView { profile in
+                Task { await viewModel?.add(profile) }
+            }
+        }
+        // onAppear: view was just created with openAddSheet already true (batched state update)
+        .onAppear {
+            if openAddSheet { showAdd = true; openAddSheet = false }
+        }
+        // onChange: view already visible, parent sets openAddSheet later
+        .onChange(of: openAddSheet) { _, new in
+            if new { showAdd = true; openAddSheet = false }
         }
         .navigationTitle(String(localized: "Profiles"))
     }
@@ -72,11 +88,6 @@ private struct ProfileListContent: View {
                 emptyState
             } else {
                 profileList
-            }
-        }
-        .sheet(isPresented: $showAdd) {
-            AddProfileView { profile in
-                Task { await viewModel.add(profile) }
             }
         }
         .sheet(isPresented: $showImport) {

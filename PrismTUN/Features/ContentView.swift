@@ -9,6 +9,7 @@ struct ContentView: View {
     @Environment(VPNManager.self) private var vpnManager
     @Environment(\.openWindow) private var openWindow
     @State private var selectedTab: Tab = .dashboard
+    @State private var showAddProfileSheet = false
 
     var body: some View {
         NavigationSplitView {
@@ -16,7 +17,7 @@ struct ContentView: View {
         } detail: {
             switch selectedTab {
             case .dashboard:    DashboardView()
-            case .profiles:     ProfileListView()
+            case .profiles:     ProfileListView(openAddSheet: $showAddProfileSheet)
             case .routing:      RoutingView()
             case .connections:  ConnectionsView()
             case .logs:         LogsView()
@@ -33,6 +34,7 @@ struct ContentView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .newProfileRequested)) { _ in
             selectedTab = .profiles
+            showAddProfileSheet = true
         }
     }
 
