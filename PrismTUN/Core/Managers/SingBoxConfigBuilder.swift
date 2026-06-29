@@ -262,13 +262,21 @@ enum SingBoxConfigBuilder {
             routeRules.append(r)
         }
 
-        // Built-in block / bypass rules
-        routeRules.append(contentsOf: [
-            ["geosite": "category-ads-all", "outbound": "block"],
-            ["geosite": "cn", "outbound": "direct"],
-            ["geoip": "cn",   "outbound": "direct"],
-            ["geoip": "private", "outbound": "direct"]
+        // Private / loopback bypass — explicit CIDRs, no geo database required
+        routeRules.append([
+            "ip_cidr": ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16",
+                        "127.0.0.0/8", "169.254.0.0/16", "::1/128", "fc00::/7"],
+            "outbound": "direct"
         ])
+
+        // Geo-based rules only when databases are present (avoids sing-box startup failure)
+        if geoPaths != nil {
+            routeRules.append(contentsOf: [
+                ["geosite": "category-ads-all", "outbound": "block"],
+                ["geosite": "cn",               "outbound": "direct"],
+                ["geoip":   "cn",               "outbound": "direct"]
+            ])
+        }
 
         let finalOutbound: String
         switch mode {

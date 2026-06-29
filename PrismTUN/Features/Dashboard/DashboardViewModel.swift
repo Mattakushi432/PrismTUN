@@ -27,7 +27,7 @@ final class DashboardViewModel {
     var activeProfileID: UUID?   { profileManager.activeProfileID }
 
     func setActiveProfile(id: UUID) async { await profileManager.setActive(id: id) }
-    func connect() async { await vpnManager.connect() }
+    func connect() async { await vpnManager.connect(mode: vpnManager.connectionMode) }
     func disconnect() async { await vpnManager.disconnect() }
     func setMode(_ mode: ConnectionMode) async { await vpnManager.setMode(mode) }
 

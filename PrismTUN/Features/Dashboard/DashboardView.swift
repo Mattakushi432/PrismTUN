@@ -10,6 +10,9 @@ struct DashboardView: View {
         Group {
             if let vm = viewModel {
                 DashboardContent(viewModel: vm)
+            } else {
+                ProgressView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
         .task {
