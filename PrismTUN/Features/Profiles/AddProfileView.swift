@@ -6,6 +6,16 @@ struct AddProfileView: View {
     @State private var profile = ProxyProfile()
     @Environment(\.dismiss) private var dismiss
 
+    private func defaultPort(for proto: ProxyProtocol) -> Int {
+        switch proto {
+        case .socks5:      return 1080
+        case .http:        return 8080
+        case .shadowsocks: return 8388
+        case .wireguard:   return 51820
+        case .vmess, .vless, .trojan, .hysteria2, .tuic: return 443
+        }
+    }
+
     var body: some View {
         NavigationStack {
             Form {
@@ -34,22 +44,41 @@ struct AddProfileView: View {
 
     private var generalSection: some View {
         Section("General") {
-            TextField("Name", text: $profile.name)
+            TextField("Name (optional)", text: $profile.name)
+                .help("A friendly label. Leave blank to auto-label from host.")
             Picker("Protocol", selection: $profile.protocol) {
                 ForEach(ProxyProtocol.allCases, id: \.self) { proto in
                     Text(proto.displayName).tag(proto)
                 }
+            }
+            .onChange(of: profile.protocol) { _, newProto in
+                profile.port = defaultPort(for: newProto)
+            }
+            if profile.protocol == .socks5 || profile.protocol == .http {
+                Label(
+                    profile.protocol == .socks5
+                        ? "SOCKS5 routes all TCP/UDP traffic. For a local proxy app on this Mac (sing-box, Clash, v2ray), use 127.0.0.1 as host."
+                        : "HTTP proxy handles HTTP/HTTPS traffic. For a local proxy on this Mac, use 127.0.0.1 as host.",
+                    systemImage: "info.circle"
+                )
+                .font(.caption)
+                .foregroundStyle(.secondary)
             }
         }
     }
 
     private var serverSection: some View {
         Section("Server") {
-            TextField("Host / IP", text: $profile.server)
+            TextField(
+                profile.protocol == .socks5 || profile.protocol == .http
+                    ? "127.0.0.1  (or remote server IP / hostname)"
+                    : "example.com  (or IP address)",
+                text: $profile.server
+            )
             HStack {
                 Text("Port")
                 Spacer()
-                TextField("443", value: $profile.port, format: .number)
+                TextField("\(defaultPort(for: profile.protocol))", value: $profile.port, format: .number)
                     .multilineTextAlignment(.trailing)
                     .frame(width: 70)
             }

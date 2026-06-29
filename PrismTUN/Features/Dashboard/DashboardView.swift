@@ -2,7 +2,8 @@ import SwiftUI
 import Charts
 
 struct DashboardView: View {
-    @Environment(VPNManager.self) private var vpnManager
+    @Environment(VPNManager.self)     private var vpnManager
+    @Environment(ProfileManager.self) private var profileManager
     @State private var viewModel: DashboardViewModel?
 
     var body: some View {
@@ -13,7 +14,7 @@ struct DashboardView: View {
         }
         .task {
             guard viewModel == nil else { return }
-            let vm = DashboardViewModel(vpnManager: vpnManager)
+            let vm = DashboardViewModel(vpnManager: vpnManager, profileManager: profileManager)
             viewModel = vm
             vm.startUpdating()
         }
@@ -44,70 +45,163 @@ private struct StatusCard: View {
 
     var body: some View {
         GroupBox {
-            VStack(spacing: 16) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(viewModel.status.displayName)
-                            .font(.title2.bold())
-                        Text("Profile: \(viewModel.activeProfileName)")
+            if !viewModel.hasProfiles {
+                OnboardingPrompt()
+            } else {
+                connectedContent
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var connectedContent: some View {
+        VStack(spacing: 16) {
+            // ── Header: status + indicator ──
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(viewModel.status.displayName)
+                        .font(.title2.bold())
+                    if viewModel.activeProfileID == nil {
+                        Text("No profile selected")
+                            .font(.subheadline)
+                            .foregroundStyle(.orange)
+                    } else {
+                        Text(viewModel.activeProfileName)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
-                    Spacer()
-                    Circle()
-                        .fill(viewModel.isConnected ? Color.green : Color.red)
-                        .frame(width: 14, height: 14)
-                        .shadow(color: viewModel.isConnected ? .green : .red, radius: 4)
                 }
+                Spacer()
+                Circle()
+                    .fill(viewModel.isConnected ? Color.green : Color.gray)
+                    .frame(width: 14, height: 14)
+                    .shadow(color: viewModel.isConnected ? .green : .clear, radius: 4)
+            }
 
-                if let err = viewModel.errorMessage {
-                    Text(err)
-                        .font(.caption)
-                        .foregroundStyle(.red)
-                }
+            // ── Profile picker ──
+            ProfilePickerRow(viewModel: viewModel)
 
-                HStack(spacing: 12) {
-                    ForEach(ConnectionMode.allCases, id: \.self) { mode in
-                        ModeButton(
-                            mode: mode,
-                            isActive: viewModel.connectionMode == mode,
-                            action: { Task { await viewModel.setMode(mode) } }
-                        )
-                    }
-                }
+            if let err = viewModel.errorMessage {
+                Text(err)
+                    .font(.caption)
+                    .foregroundStyle(.red)
+            }
 
-                HStack(spacing: 12) {
-                    switch viewModel.status {
-                    case .connecting:
-                        HStack(spacing: 8) {
-                            ProgressView()
-                                .controlSize(.small)
-                            Text(String(localized: "Connecting…"))
-                                .foregroundStyle(.secondary)
-                        }
-                        .frame(maxWidth: .infinity)
-                    case .connected:
-                        Button(role: .destructive) {
-                            Task { await viewModel.disconnect() }
-                        } label: {
-                            Label(String(localized: "Disconnect"), systemImage: "stop.circle")
-                                .frame(maxWidth: .infinity)
-                        }
-                        .controlSize(.large)
-                        .buttonStyle(.bordered)
-                    default:
-                        Button {
-                            Task { await viewModel.connect() }
-                        } label: {
-                            Label(String(localized: "Connect"), systemImage: "play.circle.fill")
-                                .frame(maxWidth: .infinity)
-                        }
-                        .controlSize(.large)
-                        .buttonStyle(.borderedProminent)
-                    }
+            // ── Mode selector ──
+            HStack(spacing: 8) {
+                ForEach(ConnectionMode.allCases, id: \.self) { mode in
+                    ModeButton(
+                        mode: mode,
+                        isActive: viewModel.connectionMode == mode,
+                        action: { Task { await viewModel.setMode(mode) } }
+                    )
                 }
             }
-            .padding(8)
+
+            // ── Connect / Disconnect ──
+            connectButton
+        }
+        .padding(8)
+    }
+
+    @ViewBuilder
+    private var connectButton: some View {
+        switch viewModel.status {
+        case .connecting:
+            HStack(spacing: 8) {
+                ProgressView().controlSize(.small)
+                Text(String(localized: "Connecting…")).foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity)
+        case .connected:
+            Button(role: .destructive) {
+                Task { await viewModel.disconnect() }
+            } label: {
+                Label(String(localized: "Disconnect"), systemImage: "stop.circle")
+                    .frame(maxWidth: .infinity)
+            }
+            .controlSize(.large)
+            .buttonStyle(.bordered)
+        default:
+            Button {
+                Task { await viewModel.connect() }
+            } label: {
+                Label(String(localized: "Connect"), systemImage: "play.circle.fill")
+                    .frame(maxWidth: .infinity)
+            }
+            .controlSize(.large)
+            .buttonStyle(.borderedProminent)
+            .disabled(viewModel.activeProfileID == nil)
+        }
+    }
+}
+
+// MARK: - Onboarding prompt (no profiles)
+
+private struct OnboardingPrompt: View {
+    var body: some View {
+        VStack(spacing: 20) {
+            Image(systemName: "server.rack")
+                .font(.system(size: 40))
+                .foregroundStyle(.secondary)
+
+            VStack(spacing: 6) {
+                Text("No Proxy Profiles")
+                    .font(.headline)
+                Text("Add a profile to get started. You can create a SOCKS5, HTTP, Shadowsocks, VMess, VLESS, Trojan, or WireGuard proxy — or import a subscription link.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+
+            VStack(spacing: 8) {
+                Button {
+                    NotificationCenter.default.post(name: .newProfileRequested, object: nil)
+                } label: {
+                    Label("Add Profile", systemImage: "plus.circle.fill")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+
+                Text("Tip: For a local proxy (e.g. sing-box, Clash, v2ray running on this Mac), use host 127.0.0.1 with the listening port.")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+                    .multilineTextAlignment(.center)
+            }
+        }
+        .padding(.vertical, 8)
+    }
+}
+
+// MARK: - Profile picker row
+
+private struct ProfilePickerRow: View {
+    let viewModel: DashboardViewModel
+
+    private var pickerBinding: Binding<UUID?> {
+        Binding(
+            get: { viewModel.activeProfileID },
+            set: { id in
+                guard let id else { return }
+                Task { await viewModel.setActiveProfile(id: id) }
+            }
+        )
+    }
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "server.rack")
+                .foregroundStyle(.secondary)
+                .frame(width: 16)
+            Picker("Profile", selection: pickerBinding) {
+                Text("Select a profile…").tag(Optional<UUID>.none)
+                ForEach(viewModel.profiles) { profile in
+                    Text(profile.name.isEmpty ? "\(profile.protocol.displayName) · \(profile.server):\(profile.port)" : profile.name)
+                        .tag(Optional(profile.id))
+                }
+            }
+            .labelsHidden()
         }
     }
 }
@@ -124,10 +218,13 @@ private struct ModeButton: View {
                 .padding(.horizontal, 10)
                 .padding(.vertical, 4)
                 .background(isActive ? Color.accentColor : Color.secondary.opacity(0.15))
-                .foregroundStyle(isActive ? .white : .primary)
+                .foregroundStyle(isActive ? .white : (mode.isAvailable ? .primary : .secondary))
                 .clipShape(Capsule())
         }
         .buttonStyle(.plain)
+        .disabled(!mode.isAvailable)
+        .help(mode.isAvailable ? mode.description : mode.description)
+        .opacity(mode.isAvailable ? 1 : 0.5)
     }
 }
 

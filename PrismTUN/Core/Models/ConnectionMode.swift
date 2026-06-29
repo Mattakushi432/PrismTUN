@@ -11,7 +11,7 @@ enum ConnectionMode: String, Codable, CaseIterable, Sendable {
         case .systemProxy: "System Proxy"
         case .direct:      "Direct"
         case .global:      "Global"
-        case .tun:         "TUN"
+        case .tun:         "TUN ⚠️"
         }
     }
 
@@ -20,7 +20,9 @@ enum ConnectionMode: String, Codable, CaseIterable, Sendable {
         case .systemProxy: "Routes traffic matching rules through the proxy"
         case .direct:      "All traffic goes directly, bypassing proxy"
         case .global:      "All traffic goes through the proxy"
-        case .tun:         "Routes all traffic via a virtual TUN interface (requires Developer ID signing)"
+        case .tun:         "Routes all traffic via a virtual TUN interface. Requires Apple Developer ID certificate — not available in this build."
         }
     }
+
+    var isAvailable: Bool { self != .tun }
 }

@@ -51,11 +51,49 @@ struct RoutingView: View {
     // MARK: - Subviews
 
     private var emptyState: some View {
-        ContentUnavailableView(
-            String(localized: "No Routing Rules"),
-            systemImage: "arrow.triangle.branch",
-            description: Text(String(localized: "Add rules to control how traffic is routed through the proxy."))
-        )
+        ScrollView {
+            VStack(spacing: 24) {
+                Image(systemName: "arrow.triangle.branch")
+                    .font(.system(size: 44))
+                    .foregroundStyle(.secondary)
+                    .padding(.top, 32)
+
+                VStack(spacing: 8) {
+                    Text(String(localized: "No Routing Rules"))
+                        .font(.title3.bold())
+                    Text(String(localized: "Without rules, all traffic follows the mode you chose on the Dashboard (System Proxy, Global, etc.).\nRouting rules let you override this per domain or IP — send via Proxy, go Direct, or Block entirely."))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+
+                HStack(spacing: 16) {
+                    RoutingLegendItem(color: .blue,  icon: "arrow.up.forward.circle.fill", label: String(localized: "Proxy"),  detail: String(localized: "Goes through your proxy server"))
+                    RoutingLegendItem(color: .green, icon: "arrow.right.circle.fill",      label: String(localized: "Direct"), detail: String(localized: "Bypasses proxy, goes direct"))
+                    RoutingLegendItem(color: .red,   icon: "xmark.circle.fill",             label: String(localized: "Block"),  detail: String(localized: "Connection dropped"))
+                }
+                .padding(.horizontal, 8)
+
+                VStack(spacing: 10) {
+                    Text(String(localized: "Quick start with a preset:"))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    HStack(spacing: 10) {
+                        PresetChip(title: String(localized: "Bypass China"), detail: String(localized: "Chinese sites go direct, rest via proxy")) {
+                            Task { await routingVM.addPreset(RulePresets.bypassChina) }
+                        }
+                        PresetChip(title: String(localized: "Bypass LAN"),   detail: String(localized: "Local network always goes direct")) {
+                            Task { await routingVM.addPreset(RulePresets.bypassLAN) }
+                        }
+                        PresetChip(title: String(localized: "Block Ads"),    detail: String(localized: "Block common ad domains")) {
+                            Task { await routingVM.addPreset(RulePresets.blockAds) }
+                        }
+                    }
+                }
+                .padding(.bottom, 32)
+            }
+            .padding(.horizontal, 40)
+        }
     }
 
     private var rulesList: some View {
@@ -174,6 +212,54 @@ private struct OutboundBadge: View {
         case .direct: .green
         case .block:  .red
         }
+    }
+}
+
+// MARK: - Empty state helpers
+
+private struct RoutingLegendItem: View {
+    let color: Color
+    let icon: String
+    let label: String
+    let detail: String
+
+    var body: some View {
+        VStack(spacing: 6) {
+            Image(systemName: icon)
+                .font(.title2)
+                .foregroundStyle(color)
+            Text(label)
+                .font(.caption.bold())
+            Text(detail)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(12)
+        .background(color.opacity(0.07))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+    }
+}
+
+private struct PresetChip: View {
+    let title: String
+    let detail: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 3) {
+                Text(title).font(.caption.bold())
+                Text(detail).font(.caption2).foregroundStyle(.secondary).multilineTextAlignment(.center)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .frame(maxWidth: .infinity)
+            .background(Color.accentColor.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+        }
+        .buttonStyle(.plain)
     }
 }
 
